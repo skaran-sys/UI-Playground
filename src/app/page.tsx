@@ -1,68 +1,135 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import HeaderLayout from "@/themes/fizzyGoblet/header/layout_template";
+import FooterLayout from "@/themes/fizzyGoblet/footer/layout_template";
+import sampleFooterProps from "@/themes/fizzyGoblet/footer/props.sample";
+import sampleHeaderProps from "@/themes/fizzyGoblet/header/props.sample";
+import HeroLayout from "@/themes/fizzyGoblet/hero/layout_template";
+import sampleHeroProps from "@/themes/fizzyGoblet/hero/props.sample";
+import BrandStoryLayout from "@/themes/fizzyGoblet/brandStory/layout_template";
+import sampleBrandStoryProps from "@/themes/fizzyGoblet/brandStory/props.sample";
+import TestimonialsLayout from "@/themes/fizzyGoblet/testimonials/layout_template";
+import sampleTestimonialsProps from "@/themes/fizzyGoblet/testimonials/props.sample"; 
+import MainCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/mainCategory/layout_template";
+import sampleMainCategoryProps from "@/themes/fizzyGoblet/categoryCollections/mainCategory/props.sample"
+import ShopByCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/layout_template";
+import sampleShopByCategoryProps from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/props.sample"
+import AccessoryCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/layout_template";
+import sampleAccessoryCategoryProps from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/props.sample"
+import GridCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/gridCategory/layout_template";
+import sampleGridCategoryProps from "@/themes/fizzyGoblet/categoryCollections/gridCategory/props.sample"  
+import ProductCollectionLayout from "@/themes/fizzyGoblet/productCollections/productCollection1/layout_template";
+import sampleProductCollectionProps from "@/themes/fizzyGoblet/productCollections/productCollection1/props.samples";
+
+
+import CartLayout from "@/themes/fizzyGoblet/cart/layout_template";
+import sampleCartProps from "@/themes/fizzyGoblet/cart/props.sample";
+
+export default function PlaygroundPage() {
+  const [activeTheme] = useState<string>("fizzyGoblet");
+  const [activeComponent, setActiveComponent] = useState<"header" | "hero" | "cart" | "all">("all");
+  const [activeTab, setActiveTab] = useState<"ui" | "props">("ui");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div
+      className="min-h-screen font-sans antialiased transition-colors"
+      style={{
+        backgroundColor: "var(--color-background)",
+        color: "var(--color-text)",
+      }}
+    >
+
+      {/* Main Canvas */}
+      <main className="">
+        {activeTab === "ui" ? (
+          <div className="space-y-0">
+            {(activeComponent === "all" || activeComponent === "header") && (
+              <HeaderLayout {...sampleHeaderProps} />
+            )}
+
+            {(activeComponent === "all" || activeComponent === "hero") && (
+              <HeroLayout {...sampleHeroProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <MainCategoryLayout {...sampleMainCategoryProps } />
+            )}
+            {(activeComponent === "all") && (
+              <ProductCollectionLayout {...sampleProductCollectionProps} />
+            )}
+            
+            {(activeComponent === "all") && (
+              <ProductCollectionLayout {...sampleProductCollectionProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <ShopByCategoryLayout {...sampleShopByCategoryProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <AccessoryCategoryLayout {...sampleAccessoryCategoryProps } />
+            )}
+
+             {(activeComponent === "all") && (
+              <ProductCollectionLayout {...sampleProductCollectionProps} />
+            )} 
+
+            {(activeComponent === "all") && (
+              <GridCategoryLayout {...sampleGridCategoryProps} />
+            )}  
+
+            {(activeComponent === "all") && (
+              <BrandStoryLayout {...sampleBrandStoryProps } />
+            )} 
+
+            {(activeComponent === "all") && (
+              <TestimonialsLayout {...sampleTestimonialsProps} />
+            )}  
+
+            {/* {(activeComponent === "all" || activeComponent === "cart") && (
+              <div className="space -y-2 max-w-lg mx-auto">
+                <div className="text-xs font-mono uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
+                  src/themes/fizzyGoblet/cart/layout_template.tsx
+                </div>
+                <div className="border rounded-2xl overflow-hidden shadow-sm" style={{ borderColor: "var(--color-border)" }}>
+                  <CartLayout {...sampleCartProps} />
+                </div>
+              </div>
+            )} */}
+
+            {(activeComponent === "all") && (
+              <FooterLayout {...sampleFooterProps} />
+            )}
+          </div>
+        ) : (
+          /* Props JSON Inspector */
+          <div
+            className="border rounded-2xl p-6 font-mono text-xs overflow-x-auto shadow-sm"
+            style={{
+              backgroundColor: "var(--color-surface-light)",
+              borderColor: "var(--color-border)",
+              color: "var(--color-primary)",
+            }}
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <div className="pb-3 mb-3 border-b font-sans text-sm font-bold" style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}>
+              Active Props Sample for: <span className="font-mono uppercase" style={{ color: "var(--color-primary)" }}>{activeComponent}</span>
+            </div>
+            <pre>
+              {JSON.stringify(
+                activeComponent === "header"
+                  ? sampleHeaderProps
+                  : activeComponent === "hero"
+                    ? sampleHeroProps
+                    : activeComponent === "cart"
+                      ? sampleCartProps
+                      : { header: sampleHeaderProps, hero: sampleHeroProps, cart: sampleCartProps },
+                null,
+                2
+              )}
+            </pre>
+          </div>
+        )}
       </main>
     </div>
   );

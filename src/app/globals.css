@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* ==========================
+     Background
+     ========================== */
+  --color-background: #FBF7F1;       /* warm ivory, matches product photography backdrop */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* ==========================
+     Surface
+     ========================== */
+  --color-surface: #F3EBDD;          /* soft sand/beige, sits between bg and cards */
+  --color-surface-light: #FFFDF9;    /* near-white card surface */
+  --color-surface-lighter: #F7F2EA;  /* subtle hover/alt row surface */
+  --color-surface-contrast: #1A1410; /* deep espresso-black for contrast blocks */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ==========================
+     Primary
+     ========================== */
+ --color-primary: #E8A2A2;          /* base — Fizzy Goblet rose */
+--color-primary-light: #EFBCBC;    /* lighter tint, hover states */
+--color-primary-lighter: #F7DEDE;  /* palest tint, subtle fills/badges */  /* muted rose, tags/badges */
+  --color-primary-contrast: #FFFFFF;
+
+  /* ==========================
+     Text
+     ========================== */
+  --color-text: #221A15;             /* warm near-black, softer than pure #111 */
+  --color-text-muted: #6E6259;
+  --color-text-light: #A69A8C;
+  --color-text-inverse: #FFFFFF;
+
+  /* ==========================
+     Border
+     ========================== */
+  --color-border: #E8DFD1;           /* warm neutral border, ties to surface tones */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: Arial, Helvetica, sans-serif;
 }
