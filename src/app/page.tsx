@@ -7,10 +7,14 @@ import sampleFooterProps from "@/themes/fizzyGoblet/footer/props.sample";
 import sampleHeaderProps from "@/themes/fizzyGoblet/header/props.sample";
 import HeroLayout from "@/themes/fizzyGoblet/hero/layout_template";
 import sampleHeroProps from "@/themes/fizzyGoblet/hero/props.sample";
-import BrandStoryLayout from "@/themes/fizzyGoblet/brandStory/layout_template";
-import sampleBrandStoryProps from "@/themes/fizzyGoblet/brandStory/props.sample";
+import BrandStoryLayout from "@/themes/fizzyGoblet/brandStory/ourStore/layout_template";
+import sampleBrandStoryProps from "@/themes/fizzyGoblet/brandStory/ourStore/props.sample";
+import OurStorySectionLayout from "@/themes/fizzyGoblet/brandStory/ourStory/layout_template";
+import sampleOurStoryProps from "@/themes/fizzyGoblet/brandStory/ourStory/props.sample";
+import AboutUsLayout from "@/themes/fizzyGoblet/aboutUs/layout_template";
+import sampleAboutUsProps from "@/themes/fizzyGoblet/aboutUs/props.sample";
 import TestimonialsLayout from "@/themes/fizzyGoblet/testimonials/layout_template";
-import sampleTestimonialsProps from "@/themes/fizzyGoblet/testimonials/props.sample"; 
+import sampleTestimonialsProps from "@/themes/fizzyGoblet/testimonials/props.sample";
 import MainCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/mainCategory/layout_template";
 import sampleMainCategoryProps from "@/themes/fizzyGoblet/categoryCollections/mainCategory/props.sample"
 import ShopByCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/layout_template";
@@ -18,10 +22,13 @@ import sampleShopByCategoryProps from "@/themes/fizzyGoblet/categoryCollections/
 import AccessoryCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/layout_template";
 import sampleAccessoryCategoryProps from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/props.sample"
 import GridCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/gridCategory/layout_template";
-import sampleGridCategoryProps from "@/themes/fizzyGoblet/categoryCollections/gridCategory/props.sample"  
+import sampleGridCategoryProps from "@/themes/fizzyGoblet/categoryCollections/gridCategory/props.sample"
 import ProductCollectionLayout from "@/themes/fizzyGoblet/productCollections/productCollection1/layout_template";
 import sampleProductCollectionProps from "@/themes/fizzyGoblet/productCollections/productCollection1/props.samples";
-
+import WishlistLayout from "@/themes/fizzyGoblet/wishList/layout_template";
+import sampleWishlistProps from "@/themes/fizzyGoblet/wishList/props.sample";
+import ProductDetailLayout from "@/themes/fizzyGoblet/productDetails/layout_template";
+import sampleProductDetailProps from "@/themes/fizzyGoblet/productDetails/props.sample";
 
 import CartLayout from "@/themes/fizzyGoblet/cart/layout_template";
 import sampleCartProps from "@/themes/fizzyGoblet/cart/props.sample";
@@ -30,6 +37,7 @@ export default function PlaygroundPage() {
   const [activeTheme] = useState<string>("fizzyGoblet");
   const [activeComponent, setActiveComponent] = useState<"header" | "hero" | "cart" | "all">("all");
   const [activeTab, setActiveTab] = useState<"ui" | "props">("ui");
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
   return (
     <div
@@ -41,7 +49,7 @@ export default function PlaygroundPage() {
     >
 
       {/* Main Canvas */}
-      <main className="">
+      <main className="relative">
         {activeTab === "ui" ? (
           <div className="space-y-0">
             {(activeComponent === "all" || activeComponent === "header") && (
@@ -53,12 +61,16 @@ export default function PlaygroundPage() {
             )}
 
             {(activeComponent === "all") && (
-              <MainCategoryLayout {...sampleMainCategoryProps } />
+              <ProductDetailLayout {...sampleProductDetailProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <MainCategoryLayout {...sampleMainCategoryProps} />
             )}
             {(activeComponent === "all") && (
               <ProductCollectionLayout {...sampleProductCollectionProps} />
             )}
-            
+
             {(activeComponent === "all") && (
               <ProductCollectionLayout {...sampleProductCollectionProps} />
             )}
@@ -68,38 +80,52 @@ export default function PlaygroundPage() {
             )}
 
             {(activeComponent === "all") && (
-              <AccessoryCategoryLayout {...sampleAccessoryCategoryProps } />
+              <AccessoryCategoryLayout {...sampleAccessoryCategoryProps} />
             )}
 
-             {(activeComponent === "all") && (
+            {(activeComponent === "all") && (
               <ProductCollectionLayout {...sampleProductCollectionProps} />
-            )} 
+            )}
 
             {(activeComponent === "all") && (
               <GridCategoryLayout {...sampleGridCategoryProps} />
-            )}  
+            )}
 
             {(activeComponent === "all") && (
-              <BrandStoryLayout {...sampleBrandStoryProps } />
-            )} 
+              <OurStorySectionLayout {...sampleOurStoryProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <BrandStoryLayout {...sampleBrandStoryProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <AboutUsLayout {...sampleAboutUsProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <WishlistLayout {...sampleWishlistProps} />
+            )}
 
             {(activeComponent === "all") && (
               <TestimonialsLayout {...sampleTestimonialsProps} />
-            )}  
+            )}
 
-            {/* {(activeComponent === "all" || activeComponent === "cart") && (
-              <div className="space -y-2 max-w-lg mx-auto">
-                <div className="text-xs font-mono uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
-                  src/themes/fizzyGoblet/cart/layout_template.tsx
-                </div>
-                <div className="border rounded-2xl overflow-hidden shadow-sm" style={{ borderColor: "var(--color-border)" }}>
-                  <CartLayout {...sampleCartProps} />
-                </div>
-              </div>
-            )} */}
+            <button className="bg-red-500 text-white px-4 py-2 text-xs font-semibold m-4 rounded" onClick={() => { setIsCartOpen(true) }}>
+              Open cart
+            </button>
 
             {(activeComponent === "all") && (
               <FooterLayout {...sampleFooterProps} />
+            )}
+
+            {/* Slide-over Right Cart Drawer with Left Dark Translucent Overlay */}
+            {isCartOpen && (
+              <CartLayout
+                {...sampleCartProps}
+                isSidebar={true}
+                onClose={() => setIsCartOpen(false)}
+              />
             )}
           </div>
         ) : (

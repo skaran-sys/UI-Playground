@@ -24,6 +24,17 @@ interface Product {
   description: string;
 
   specs: ProductSpec[];
+
+  inStock?: boolean;
+  taxInclusive?: boolean;
+  sku?: string;
+  supplierInfo?: string;
+  returnRules?: string;
+  badge?: string;
+  highlights?: string[];
+  sizeChart?: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
 interface ProductDetailConfig {
@@ -102,11 +113,12 @@ export interface ProductDetailProps {
   config: ProductDetailConfig;
   product: Product;
   loading: boolean;
-  onAddToCart: (qty:number, variant?:string) => void;
-  onBuyNow: (qty:number, variant?:string) => void;
+  isWishlisted: boolean;
+  addToWishlist?: () => void;
+  onAddToCart: (qty: number, variant?: string) => void;
+  onBuyNow: (qty: number, variant?: string) => void;
   loadSimilarProducts: () => Promise<SimilarProducts>;
   loadReviews: () => Promise<ProductReview[]>;
-  isWishlisted: boolean;
   onToggleWishlist: () => Promise<ProductReview[]>;
   isFreeShipping?: boolean;
 }

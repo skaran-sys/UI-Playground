@@ -10,9 +10,9 @@ export interface ConfigType {
 type Item = {
   id: string;
   image: string;
-  hover_image: string;
+  hover_image?: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   link?: string;
 };
 
