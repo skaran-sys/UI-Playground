@@ -2,63 +2,45 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
-export interface HeroLayoutPropsType {
-  config: any;
+export interface BannerItem {
+  media: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  cta_text: string;
+  cta_link: string;
+  cta_style: 'primary' | 'secondary' | 'outline';
 }
 
-export interface HeroBannerConfig {
-  layout_id: string
-  media: HeroMedia[]
-  autoSlide?: boolean
-  interval?: number
-  text?: {
-    title?: string
-    subtitle?: string
-    description?: string
-  }
-  cta?: HeroCTA[]
+export interface BannerSectionProps {
+  layout_id: string;
+  autoSlide: boolean;
+  interval: number;
+  contentAlignment: 'left' | 'center' | 'right';
+  banner: BannerItem[];
 }
 
-export interface HeroMedia {
-  type: "image" | "video"
-  url: string
-  mobileUrl?: string
-  alt?: string
-  poster?: string // for videos
-  text?: {
-    title?: string
-    subtitle?: string
-    description?: string
-  }
-  cta?: HeroCTA[]
-}
-
-export interface HeroCTA {
-  text: string
-  link: string
-  style?: "primary" | "secondary" | "outline" | "clear"
-  position?:
-  | "top-left"
-  | "top-center"
-  | "top-right"
-  | "center-left"
-  | "center"
-  | "center-right"
-  | "bottom-left"
-  | "bottom-center"
-  | "bottom-right"
-  target?: "_self" | "_blank"
-}
+export type HeroLayoutPropsType = BannerSectionProps | { config: BannerSectionProps };
 
 export default function Layout(props: HeroLayoutPropsType) {
-  const config: HeroBannerConfig = props.config || {};
-  const mediaList: HeroMedia[] = config.media || [];
-  const totalSlides = mediaList.length;
+  // Support both direct props and nested config wrapper
+  const heroProps: BannerSectionProps = 'config' in props ? props.config : props;
+
+  const {
+    layout_id,
+    autoSlide = true,
+    interval = 5000,
+    contentAlignment = 'left',
+    banner = []
+  } = heroProps || {};
+
+  const totalSlides = banner.length;
 
   // Clone first and last slides for seamless circular wrap-around
-  const slides = totalSlides > 1 ? [mediaList[totalSlides - 1], ...mediaList, mediaList[0]] : mediaList;
+  const slides = totalSlides > 1 ? [banner[totalSlides - 1], ...banner, banner[0]] : banner;
   const [currentIndex, setCurrentIndex] = useState<number>(totalSlides > 1 ? 1 : 0);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   const handleNextSlide = useCallback(() => {
     if (totalSlides <= 1) return;
@@ -84,50 +66,36 @@ export default function Layout(props: HeroLayoutPropsType) {
   };
 
   useEffect(() => {
-    if (!config.autoSlide || totalSlides <= 1) return;
-    const intervalDuration = config.interval || 5000;
+    if (!autoSlide || isPaused || totalSlides <= 1) return;
+    const intervalDuration = interval || 5000;
     const timer = setInterval(() => {
       handleNextSlide();
     }, intervalDuration);
 
     return () => clearInterval(timer);
-  }, [config.autoSlide, config.interval, totalSlides, handleNextSlide]);
+  }, [autoSlide, isPaused, interval, totalSlides, handleNextSlide]);
 
   if (totalSlides === 0) {
     return null;
   }
 
   const activeSlideIndex = totalSlides > 1 ? (currentIndex - 1 + totalSlides) % totalSlides : 0;
-  const activeMedia = mediaList[activeSlideIndex];
-  const activeText = activeMedia?.text || config.text;
-  const activeCTAs = (activeMedia?.cta && activeMedia.cta.length > 0) ? activeMedia.cta : (config.cta || []);
+  const activeSlide = banner[activeSlideIndex] || banner[0];
 
-  const getPositionClasses = (position?: string) => {
-    switch (position) {
-      case 'top-left':
-        return 'items-start justify-start text-left pt-16 sm:pt-24 pl-6 sm:pl-16 md:pl-24';
-      case 'top-center':
-        return 'items-start justify-center text-center pt-16 sm:pt-24 px-6';
-      case 'top-right':
-        return 'items-start justify-end text-right pt-16 sm:pt-24 pr-6 sm:pr-16 md:pr-24';
+  const getPositionClasses = (alignment?: 'left' | 'center' | 'right') => {
+    switch (alignment) {
       case 'center':
-        return 'items-center justify-center text-center px-6';
-      case 'center-right':
-        return 'items-center justify-end text-right pr-6 sm:pr-16 md:pr-24';
-      case 'bottom-left':
-        return 'items-end justify-start text-left pb-20 sm:pb-28 pl-6 sm:pl-16 md:pl-24';
-      case 'bottom-center':
-        return 'items-end justify-center text-center pb-20 sm:pb-28 px-6';
-      case 'bottom-right':
-        return 'items-end justify-end text-right pb-20 sm:pb-28 pr-6 sm:pr-16 md:pr-24';
-      case 'center-left':
+        return 'items-center justify-center text-center px-10 sm:px-16 md:px-24';
+      case 'right':
+        return 'items-center justify-end text-right pr-10 sm:pr-16 md:pr-24 lg:pr-28 pl-10';
+      case 'left':
       default:
-        return 'items-center justify-start text-left pl-6 sm:pl-16 md:pl-24 lg:pl-28';
+        return 'items-center justify-start text-left pl-10 sm:pl-16 md:pl-24 lg:pl-28 pr-10';
     }
   };
 
-  const getCTAStyle = (style?: string) => {
-    switch (style) {
+  const getCTAStyle = (style?: 'primary' | 'secondary' | 'outline' | string) => {
+    switch (style?.toLowerCase()) {
       case 'primary':
         return {
           backgroundColor: 'var(--color-primary)',
@@ -140,12 +108,6 @@ export default function Layout(props: HeroLayoutPropsType) {
           color: 'var(--color-surface-light)',
           borderColor: 'var(--color-surface-light)'
         };
-      case 'clear':
-        return {
-          backgroundColor: 'transparent',
-          color: 'var(--color-surface-light)',
-          borderColor: 'transparent'
-        };
       case 'secondary':
       default:
         return {
@@ -156,10 +118,13 @@ export default function Layout(props: HeroLayoutPropsType) {
     }
   };
 
-  const primaryPosition = activeCTAs[0]?.position || 'center-left';
-
   return (
-    <section className="relative w-full h-screen min-h-[100dvh] overflow-hidden select-none bg-[var(--color-surface-contrast)]">
+    <section
+      id={layout_id}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="relative w-full h-screen min-h-[100dvh] overflow-hidden select-none bg-[var(--color-surface-contrast)] group/hero"
+    >
       {/* ── 1. Seamless Circular Slide Track ── */}
       <div
         onTransitionEnd={handleTransitionEnd}
@@ -169,64 +134,64 @@ export default function Layout(props: HeroLayoutPropsType) {
           transition: isTransitioning ? 'transform 700ms ease-in-out' : 'none'
         }}
       >
-        {slides.map((media, index) => (
-          <div
-            key={index}
-            className="relative w-full h-full flex-shrink-0"
-          >
-            {media.type === 'video' ? (
-              <video
-                src={media.url}
-                poster={media.poster}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover object-center"
-              />
-            ) : (
-              <picture className="w-full h-full block">
-                {media.mobileUrl && (
-                  <source media="(max-width: 640px)" srcSet={media.mobileUrl} />
-                )}
+        {slides.map((item, index) => {
+          const cleanMediaUrl = item?.media?.split('?')[0]?.toLowerCase() || '';
+          const isVideo =
+            cleanMediaUrl.endsWith('.mp4') ||
+            cleanMediaUrl.endsWith('.webm') ||
+            cleanMediaUrl.endsWith('.mov') ||
+            item?.media?.toLowerCase().includes('video');
+
+          return (
+            <div key={index} className="relative w-full h-full flex-shrink-0">
+              {isVideo ? (
+                <video
+                  src={item.media}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover object-center"
+                />
+              ) : (
                 <img
-                  src={media.url}
-                  alt={media.alt || activeText?.title || 'Hero Banner'}
+                  src={item.media || '/placeholder.jpg'}
+                  alt={item.title || 'Hero Banner'}
                   className="w-full h-full object-cover object-center"
                   loading={index === 1 ? 'eager' : 'lazy'}
                 />
-              </picture>
-            )}
+              )}
 
-            {/* Subtle Gradient Veil for Readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent pointer-events-none" />
-          </div>
-        ))}
+              {/* Subtle Gradient Veil for Readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent pointer-events-none" />
+            </div>
+          );
+        })}
       </div>
 
       {/* ── 2. Dynamic Text & CTA Content Layer ── */}
-      <div className={`absolute inset-0 z-20 flex max-w-7xl mx-auto w-full pointer-events-none ${getPositionClasses(primaryPosition)}`}>
+      <div className={`absolute inset-0 z-20 flex max-w-7xl mx-auto w-full pointer-events-none ${getPositionClasses(contentAlignment)}`}>
         <div className="max-w-xl flex flex-col pointer-events-auto">
 
           {/* Main Title (Luxury Serif Header) */}
-          {activeText?.title && (
+          {activeSlide?.title && (
             <h1
               style={{
                 color: 'var(--color-surface-light)',
                 textShadow: '0 2px 14px rgba(0, 0, 0, 0.4)'
               }}
-              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal font-serif tracking-[0.14em] uppercase leading-none"
+              className="text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-normal font-serif tracking-[0.10em] sm:tracking-[0.14em] uppercase leading-tight sm:leading-none"
             >
-              {activeText.title}
+              {activeSlide.title}
             </h1>
           )}
 
           {/* Subtitle with Filigree Divider Ornament */}
-          {activeText?.subtitle && (
+          {activeSlide?.subtitle && (
             <div className="mt-2 sm:mt-3 flex flex-col items-start">
-              <div className="flex items-center gap-2 w-full max-w-sm mb-2 opacity-85">
+              <div className="flex items-center gap-2 w-full max-w-xs sm:max-w-sm mb-1.5 sm:mb-2 opacity-85">
                 <span className="h-[1px] flex-1 bg-[var(--color-surface)]" />
-                <span className="text-[var(--color-surface)] text-xs">&#9670;</span>
+                <span className="text-[var(--color-surface)] text-[10px] sm:text-xs">&#9670;</span>
                 <span className="h-[1px] flex-1 bg-[var(--color-surface)]" />
               </div>
               <p
@@ -234,42 +199,33 @@ export default function Layout(props: HeroLayoutPropsType) {
                   color: 'var(--color-surface)',
                   textShadow: '0 1px 8px rgba(0, 0, 0, 0.5)'
                 }}
-                className="text-xs sm:text-sm md:text-base font-semibold tracking-[0.2em] uppercase font-sans leading-relaxed"
+                className="text-[10px] sm:text-sm md:text-base font-semibold tracking-[0.16em] sm:tracking-[0.2em] uppercase font-sans leading-relaxed"
               >
-                {activeText.subtitle}
+                {activeSlide.subtitle}
               </p>
             </div>
           )}
 
           {/* Optional Description */}
-          {activeText?.description && (
+          {activeSlide?.description && (
             <p
               style={{ color: 'var(--color-surface-lighter)' }}
-              className="mt-3 text-xs sm:text-sm md:text-base font-normal max-w-md leading-relaxed opacity-90 text-shadow-sm"
+              className="mt-2 sm:mt-3 text-[11px] sm:text-xs md:text-base font-normal max-w-md leading-relaxed opacity-90 text-shadow-sm"
             >
-              {activeText.description}
+              {activeSlide.description}
             </p>
           )}
 
-          {/* Dynamic Action Buttons */}
-          {activeCTAs.length > 0 && (
-            <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4 items-center">
-              {activeCTAs.map((cta, ctaIdx) => {
-                const buttonStyles = getCTAStyle(cta.style);
-
-                return (
-                  <a
-                    key={ctaIdx}
-                    href={cta.link}
-                    target={cta.target || '_self'}
-                    rel={cta.target === '_blank' ? 'noopener noreferrer' : undefined}
-                    style={buttonStyles}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-[0.18em] uppercase rounded-sm border transition-all duration-300 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-lg text-center"
-                  >
-                    {cta.text}
-                  </a>
-                );
-              })}
+          {/* Dynamic Action Button */}
+          {activeSlide?.cta_text && activeSlide?.cta_link && (
+            <div className="mt-4 sm:mt-8 flex flex-wrap gap-3 sm:gap-4 items-center">
+              <a
+                href={activeSlide.cta_link}
+                style={getCTAStyle(activeSlide.cta_style)}
+                className="px-5 sm:px-8 py-2 sm:py-3 text-[11px] sm:text-sm font-bold tracking-[0.16em] sm:tracking-[0.18em] uppercase rounded-sm border transition-all duration-300 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-lg text-center"
+              >
+                {activeSlide.cta_text}
+              </a>
             </div>
           )}
         </div>
@@ -284,10 +240,10 @@ export default function Layout(props: HeroLayoutPropsType) {
             onClick={handlePrevSlide}
             aria-label="Previous Slide"
             style={{ color: 'var(--color-surface-light)' }}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 transition-opacity opacity-70 hover:opacity-100 hover:scale-110 focus:outline-none"
+            className="absolute left-1.5 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-1.5 sm:p-3 transition-opacity opacity-70 hover:opacity-100 hover:scale-110 focus:outline-none cursor-pointer"
           >
             <svg
-              className="w-7 h-7 sm:w-10 sm:h-10 drop-shadow-md"
+              className="w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 drop-shadow-md"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -302,10 +258,10 @@ export default function Layout(props: HeroLayoutPropsType) {
             onClick={handleNextSlide}
             aria-label="Next Slide"
             style={{ color: 'var(--color-surface-light)' }}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 transition-opacity opacity-70 hover:opacity-100 hover:scale-110 focus:outline-none"
+            className="absolute right-1.5 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-1.5 sm:p-3 transition-opacity opacity-70 hover:opacity-100 hover:scale-110 focus:outline-none cursor-pointer"
           >
             <svg
-              className="w-7 h-7 sm:w-10 sm:h-10 drop-shadow-md"
+              className="w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 drop-shadow-md"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -319,7 +275,7 @@ export default function Layout(props: HeroLayoutPropsType) {
       {/* ── 4. Bottom Horizontal Slide Indicators ── */}
       {totalSlides > 1 && (
         <div className="absolute bottom-6 sm:bottom-8 left-0 right-0 z-30 flex items-center justify-center gap-2 sm:gap-3 px-4">
-          {mediaList.map((_, idx) => {
+          {banner.map((_, idx) => {
             const isSelected = idx === activeSlideIndex;
 
             return (
@@ -336,8 +292,9 @@ export default function Layout(props: HeroLayoutPropsType) {
                     ? 'var(--color-surface-light)'
                     : 'rgba(255, 255, 255, 0.35)'
                 }}
-                className={`h-[2px] sm:h-[3px] transition-all duration-300 rounded-full focus:outline-none ${isSelected ? 'w-10 sm:w-14' : 'w-6 sm:w-8 hover:bg-white/60'
-                  }`}
+                className={`h-[2px] sm:h-[3px] transition-all duration-300 rounded-full focus:outline-none cursor-pointer ${
+                  isSelected ? 'w-10 sm:w-14' : 'w-6 sm:w-8 hover:bg-white/60'
+                }`}
               />
             );
           })}
