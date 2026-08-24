@@ -18,7 +18,7 @@ export interface Product {
   stock: number;
   brand: string;
   badge: string;
-  
+  hoverImages?: string[];
 }
 
 export interface BadgeConfig {

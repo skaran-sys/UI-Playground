@@ -29,6 +29,8 @@ import WishlistLayout from "@/themes/fizzyGoblet/wishList/layout_template";
 import sampleWishlistProps from "@/themes/fizzyGoblet/wishList/props.sample";
 import ProductDetailLayout from "@/themes/fizzyGoblet/productDetails/layout_template";
 import sampleProductDetailProps from "@/themes/fizzyGoblet/productDetails/props.sample";
+import ProductListingLayout from "@/themes/fizzyGoblet/productListing/layout_template";
+import sampleProductListingProps from "@/themes/fizzyGoblet/productListing/props.sample";
 
 import CartLayout from "@/themes/fizzyGoblet/cart/layout_template";
 import sampleCartProps from "@/themes/fizzyGoblet/cart/props.sample";
@@ -58,6 +60,10 @@ export default function PlaygroundPage() {
 
             {(activeComponent === "all" || activeComponent === "hero") && (
               <HeroLayout {...sampleHeroProps} />
+            )}
+
+            {(activeComponent === "all") && (
+              <ProductListingLayout {...sampleProductListingProps} />
             )}
 
             {(activeComponent === "all") && (
