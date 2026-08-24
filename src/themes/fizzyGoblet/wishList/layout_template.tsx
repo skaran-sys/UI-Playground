@@ -204,7 +204,7 @@ export default function Layout(props: LayoutProps) {
 
         {/* ── 2. Loading State Skeletons ── */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {[1, 2, 3, 4].map((n) => (
               <div key={n} className="flex flex-col gap-3 animate-pulse">
                 <div className="w-full aspect-[4/5] bg-[var(--color-surface-lighter)] rounded-xs" />
@@ -234,7 +234,7 @@ export default function Layout(props: LayoutProps) {
           </div>
         ) : (
           /* ── 3. Product Wishlist Grid ── */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {products.map((product) => (
               <WishlistProductCard
                 key={product.id}

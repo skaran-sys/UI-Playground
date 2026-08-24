@@ -68,8 +68,8 @@ export default function Layout(props: CollectionLayoutPropType) {
   // Editorial Carousel Card Width Classes
   const carouselWidthClasses: Record<string, string> = {
     small: "w-[48%] sm:w-[32%] md:w-[24%] lg:w-[calc(20%-18px)]",
-    medium: "w-[75%] sm:w-[48%] md:w-[32%] lg:w-[calc(25%-18px)]",
-    large: "w-[85%] sm:w-[60%] md:w-[45%] lg:w-[calc(33.333%-16px)]"
+    medium: "w-[80%] sm:w-[48%] md:w-[32%] lg:w-[calc(25%-18px)]",
+    large: "w-[88%] sm:w-[60%] md:w-[45%] lg:w-[calc(33.333%-16px)]"
   };
   const resolvedCarouselWidth = carouselWidthClasses[config?.card_size || "medium"] || carouselWidthClasses.medium;
 
@@ -86,7 +86,7 @@ export default function Layout(props: CollectionLayoutPropType) {
       }}
       className="w-full py-6 select-none"
     >
-      <div className="p-2 mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* ── 1. Section Header (Title dynamic alignment, "View All" strictly pinned right) ── */}
         {config?.show_header && (

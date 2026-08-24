@@ -126,7 +126,7 @@ export default function Layout(props: CollectionLayoutPropType) {
             }}
             className="w-full py-6 select-none"
         >
-            <div className="px-8 mx-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* ── 1. Section Header ── */}
                 {config?.show_header && (

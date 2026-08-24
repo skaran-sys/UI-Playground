@@ -1,97 +1,124 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Zap } from 'lucide-react';
+import {
+  User,
+  Zap,
+  Search,
+  X,
+  TrendingUp,
+  Sparkles,
+  ArrowUpRight,
+  ShoppingBag
+} from 'lucide-react';
 
 export type MenuItem = {
-  label: string
-  href: string,
-  subMenu?: { label: string, href: string }[]
-}
+  label: string;
+  href: string;
+  subMenu?: { label: string; href: string }[];
+};
 
 export interface CategoryReference {
-  _id: string
-  name: string
+  _id: string;
+  name: string;
 }
 
 export interface Category {
-  _id: string
-  name: string
-  parent?: CategoryReference
-  children?: CategoryReference[]
+  _id: string;
+  name: string;
+  parent?: CategoryReference;
+  children?: CategoryReference[];
 }
 
 export type Product = {
-  _id: string
-  title: string
-  brand?: string
+  _id: string;
+  title: string;
+  brand?: string;
   media?: {
     coverImage?: {
-      sq1_1?: { url: string }
-    }
-  }
+      sq1_1?: { url: string };
+    };
+  };
   variants?: {
-    matrix?: { media?: { url: string } }[]
-  }
+    matrix?: { media?: { url: string } }[];
+  };
   pricing?: {
-    sale?: number
-  }
-}
+    sale?: number;
+    base?: number;
+  };
+};
 
 export type SearchResult = {
-  categories: Category[]
+  categories: Category[];
   products: {
-    items: Product[]
-  }
-}
+    items: Product[];
+  };
+};
 
 export type RecommendationSection = {
-  label: string
-  items: string[]
-  deleteApi?: string
-}
+  label: string;
+  items: string[];
+  deleteApi?: string;
+};
 
 export type SearchBoxProps = {
   onSearch: (query: string) => void;
   onDeleteRecommendation: (id: string) => void;
   loadRecommendations: () => void;
   result: {
-    categories: any[],
-    products: { items: any[] },
-  }
-  popular: any[],
-}
+    categories: any[];
+    products: { items: any[] };
+  };
+  popular: any[];
+};
 
 export type HeaderProps = {
-  wishlistCount?: number
-  cartCount?: number
-  isAuthenticated?: boolean
-  topMenuItems?: MenuItem[]
-  logoUrl: string
+  wishlistCount?: number;
+  cartCount?: number;
+  isAuthenticated?: boolean;
+  topMenuItems?: MenuItem[];
+  logoUrl: string;
   config: {
-    layout_id: string,
-    showSearch: boolean
-    showWishlist: boolean
-    showCart: boolean
-    showAuth: boolean
-    fixed: boolean
-    announcement: string | null
-  }
-  user: any
-  logout: any
+    layout_id: string;
+    showSearch: boolean;
+    showWishlist: boolean;
+    showCart: boolean;
+    showAuth: boolean;
+    fixed: boolean;
+    announcement: string | null;
+  };
+  user: any;
+  logout: any;
   storeName: string;
   onSearch: (query: string) => void;
   onDeleteRecommendation: (id: string) => void;
   loadRecommendations: () => void;
   searchResults: {
-    categories: any[],
-    products: { items: any[] },
-  }
-  popularSearch: any[],
-  menu: MenuItem[]
-}
+    categories: any[];
+    products: { items: any[] };
+  };
+  popularSearch: any[];
+  menu: MenuItem[];
+};
 
 export default function Layout(props: HeaderProps) {
+  const {
+    wishlistCount = 0,
+    cartCount = 0,
+    isAuthenticated = false,
+    topMenuItems = [],
+    logoUrl,
+    config,
+    user,
+    logout,
+    storeName,
+    onSearch,
+    loadRecommendations,
+    searchResults = { categories: [], products: { items: [] } },
+    popularSearch = [],
+    menu = []
+  } = props;
+
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isNavHovered, setIsNavHovered] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -102,11 +129,7 @@ export default function Layout(props: HeaderProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -115,41 +138,64 @@ export default function Layout(props: HeaderProps) {
 
   useEffect(() => {
     if (isSearchOpen) {
-      props.loadRecommendations?.();
-      setTimeout(() => searchInputRef.current?.focus(), 100);
+      loadRecommendations?.();
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => searchInputRef.current?.focus(), 80);
+    } else {
+      document.body.style.overflow = '';
+      setSearchQuery('');
     }
-  }, [isSearchOpen]);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchOpen, loadRecommendations]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchQuery(val);
-    props.onSearch?.(val);
+    onSearch?.(val);
   };
 
   const handleSelectPopular = (term: string) => {
     setSearchQuery(term);
-    props.onSearch?.(term);
+    onSearch?.(term);
+    searchInputRef.current?.focus();
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      onSearch?.(searchQuery.trim());
+    }
   };
 
   const isNavSolid = isScrolled || isNavHovered || Boolean(activeDropdown);
 
   return (
     <header
-      className={`w-full z-50 transition-all duration-300 ${props.config?.fixed ? 'fixed top-0 left-0 right-0' : 'relative'
-        }`}
+      className={`w-full z-50 transition-all duration-300 ${
+        config?.fixed ? 'fixed top-0 left-0 right-0' : 'relative'
+      }`}
     >
-      {/* ── 1. Announcement Banner ── */}
-      {props.config?.announcement && (
+      {/* ── 1. Announcement Top Bar ── */}
+      {config?.announcement && (
         <aside
           style={{
             backgroundColor: 'var(--color-primary)',
-            color: 'var(--color-surface-contrast)',
+            color: 'var(--color-surface-contrast)'
           }}
-          className="w-full py-2 px-4 text-center text-xs sm:text-sm font-semibold tracking-wide"
+          className="w-full py-2 px-4 text-center text-xs sm:text-sm font-semibold tracking-wide select-none"
         >
-          <p className="truncate max-w-7xl mx-auto">
-            {props.config.announcement}
-          </p>
+          <p className="truncate max-w-7xl mx-auto">{config.announcement}</p>
         </aside>
       )}
 
@@ -161,36 +207,55 @@ export default function Layout(props: HeaderProps) {
           setActiveDropdown(null);
         }}
         style={{
-          backgroundColor: isNavSolid ? 'var(--color-surface-contrast)' : 'transparent',
+          backgroundColor: isNavSolid
+            ? 'var(--color-surface-contrast)'
+            : 'transparent',
           color: 'var(--color-primary-contrast)',
-          borderBottom: isNavSolid ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent'
+          borderBottom: isNavSolid
+            ? '1px solid rgba(255,255,255,0.08)'
+            : '1px solid transparent'
         }}
-        className="w-full transition-colors duration-300 ease-in-out relative"
+        className="w-full transition-colors duration-300 ease-in-out relative select-none"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
-
-          {/* Left: Navigation Menu Items (Desktop) / Hamburger (Mobile) */}
+          
+          {/* Left Column: Desktop Menu / Mobile Hamburger */}
           <div className="flex items-center gap-6 lg:w-1/3 h-full">
-            {/* Mobile Hamburger Toggle */}
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-1.5 rounded-md text-[var(--color-primary-contrast)] focus:outline-none"
+              className="lg:hidden p-1.5 rounded-xs text-[var(--color-primary-contrast)] focus:outline-none cursor-pointer"
               aria-label="Toggle Navigation Menu"
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
 
-            {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-6 xl:gap-8 h-full">
-              {props.menu?.map((item, index) => {
-                const hasSubMenu = Boolean(item.subMenu && item.subMenu.length > 0);
+              {menu?.map((item, index) => {
+                const hasSubMenu = Boolean(
+                  item.subMenu && item.subMenu.length > 0
+                );
                 const isHovered = activeDropdown === item.label;
 
                 return (
@@ -210,16 +275,16 @@ export default function Layout(props: HeaderProps) {
                       className="text-sm font-semibold tracking-wider transition-opacity hover:opacity-80 py-2 inline-block relative"
                     >
                       {item.label}
-                      {/* Active / Hover bottom line indicator */}
                       {isHovered && (
                         <span
-                          style={{ backgroundColor: 'var(--color-primary-contrast)' }}
+                          style={{
+                            backgroundColor: 'var(--color-primary-contrast)'
+                          }}
                           className="absolute bottom-[-16px] sm:bottom-[-20px] left-0 right-0 h-[2px]"
                         />
                       )}
                     </a>
 
-                    {/* Submenu Dropdown Panel (White Surface Container) */}
                     {hasSubMenu && isHovered && item.subMenu && (
                       <div
                         style={{
@@ -227,15 +292,15 @@ export default function Layout(props: HeaderProps) {
                           color: 'var(--color-text)',
                           borderColor: 'var(--color-border)'
                         }}
-                        className="absolute left-0 top-full min-w-[210px] rounded-b-md shadow-2xl py-4 px-2 z-50 border border-t-0"
+                        className="absolute left-0 top-full min-w-[220px] rounded-b-xs shadow-2xl py-3 px-2 z-50 border border-t-0"
                       >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           {item.subMenu.map((sub, sIdx) => (
                             <a
                               key={sIdx}
                               href={sub.href}
                               style={{ color: 'var(--color-text)' }}
-                              className="px-4 py-2 text-sm font-medium tracking-wide rounded-sm hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)] transition-colors block text-left"
+                              className="px-3.5 py-2 text-xs font-medium tracking-wide rounded-xs hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)] transition-colors block text-left"
                             >
                               {sub.label}
                             </a>
@@ -249,44 +314,42 @@ export default function Layout(props: HeaderProps) {
             </ul>
           </div>
 
-          {/* Center: Brand Logo / Store Name */}
+          {/* Center Column: Logo */}
           <div className="flex justify-center items-center lg:w-1/3">
             <a href="/" className="inline-flex items-center justify-center">
-              {props.logoUrl ? (
+              {logoUrl ? (
                 <img
-                  src={props.logoUrl}
-                  alt={props.storeName}
+                  src={logoUrl}
+                  alt={storeName}
                   className="h-7 sm:h-9 w-auto object-contain"
                 />
               ) : (
-                <span className="text-xl sm:text-2xl font-medium tracking-[0.18em] uppercase select-none text-center">
-                  {props.storeName}
+                <span className="text-xl sm:text-2xl font-serif font-medium tracking-[0.18em] uppercase select-none text-center">
+                  {storeName}
                 </span>
               )}
             </a>
           </div>
 
-          {/* Right: Actions (Search, Wishlist, User, Cart) */}
+          {/* Right Column: Header Actions */}
           <div className="flex items-center justify-end gap-4 sm:gap-6 lg:w-1/3">
-            {/* Search Trigger */}
-            {props.config?.showSearch && (
+            {config?.showSearch && (
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden sm:inline-flex items-center text-sm font-medium tracking-wide hover:opacity-80 transition-opacity"
+                className="hidden sm:inline-flex items-center text-sm font-medium tracking-wide hover:opacity-80 transition-opacity cursor-pointer"
               >
                 Search
               </button>
             )}
 
-            {/* Wishlist Link */}
-            {props.config?.showWishlist && (
+            {config?.showWishlist && (
               <a
                 href="/wishlist"
                 className="hidden sm:inline-flex items-center text-sm font-medium tracking-wide hover:opacity-80 transition-opacity relative"
               >
                 <span>Wishlist</span>
-                {Boolean(props.wishlistCount && props.wishlistCount > 0) && (
+                {Boolean(wishlistCount && wishlistCount > 0) && (
                   <span
                     style={{
                       backgroundColor: 'var(--color-primary)',
@@ -294,17 +357,16 @@ export default function Layout(props: HeaderProps) {
                     }}
                     className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full"
                   >
-                    {props.wishlistCount}
+                    {wishlistCount}
                   </span>
                 )}
               </a>
             )}
 
-            {/* Auth / Account Profile Action */}
-            {props.config?.showAuth && (
+            {config?.showAuth && (
               <div className="relative group">
                 <a
-                  href={props.isAuthenticated ? "/account" : "/signin"}
+                  href={isAuthenticated ? "/account" : "/signin"}
                   className="relative p-1 inline-flex items-center justify-center hover:opacity-80 transition-opacity"
                   aria-label="User Account"
                 >
@@ -314,8 +376,7 @@ export default function Layout(props: HeaderProps) {
               </div>
             )}
 
-            {/* Cart Link with Top-Right Superscript Badge */}
-            {props.config?.showCart && (
+            {config?.showCart && (
               <a
                 href="/cart"
                 className="relative inline-flex items-center text-sm font-medium tracking-wide hover:opacity-80 transition-opacity"
@@ -326,9 +387,9 @@ export default function Layout(props: HeaderProps) {
                     backgroundColor: 'var(--color-primary-lighter)',
                     color: 'var(--color-surface-contrast)'
                   }}
-                  className=" -translate-y-2 h-4 min-w-[16px] px-1 flex items-center justify-center text-[10px] font-extrabold rounded-full"
+                  className="-translate-y-2 h-4 min-w-[16px] px-1 flex items-center justify-center text-[10px] font-extrabold rounded-full"
                 >
-                  {props.cartCount ?? 0}
+                  {cartCount ?? 0}
                 </span>
               </a>
             )}
@@ -336,124 +397,89 @@ export default function Layout(props: HeaderProps) {
         </div>
       </nav>
 
-      {/* ── 3. Minimal Light Search Overlay ── */}
+      {/* ── 3. Luxury Floating Command-Center Search Overlay ── */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black/40 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 md:p-10 select-none">
+          {/* Glassmorphic Dark Backdrop */}
           <div
-            style={{
-              backgroundColor: 'var(--color-surface-light)',
-              color: 'var(--color-text)',
-              borderBottom: '1px solid var(--color-border)'
-            }}
-            className="w-full pt-8 pb-12 px-4 sm:px-8 shadow-2xl overflow-y-auto max-h-[90vh]"
-          >
-            <div className="max-w-6xl mx-auto relative">
+            onClick={() => setIsSearchOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 ease-out cursor-pointer"
+            aria-label="Close search"
+          />
 
-              {/* Close Button Top-Right */}
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(false)}
-                style={{ color: 'var(--color-text)' }}
-                className="absolute right-0 top-0 p-2 hover:opacity-60 transition-opacity"
-                aria-label="Close Search"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          {/* Elevated Floating Search Card */}
+          <div className="relative w-full max-w-3xl bg-[#FAF7F2] text-[#1a1a1a] shadow-2xl rounded-2xl z-10 border border-neutral-200/80 overflow-hidden flex flex-col max-h-[88vh] animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Header / Input Area */}
+            <div className="p-4 sm:p-6 border-b border-neutral-200 bg-gradient-to-b from-neutral-50/50 to-[#FAF7F2]">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <Search className="w-5 h-5 text-neutral-400 mr-3.5 flex-shrink-0 stroke-[1.8]" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Type to search shoes, bags, collections..."
+                  className="w-full text-base sm:text-lg font-light text-neutral-900 placeholder:text-neutral-400 bg-transparent focus:outline-none"
+                />
 
-              {/* Centered Search Bar */}
-              <div className="max-w-xl mx-auto pt-2 pb-6">
-                <div
-                  style={{
-                    backgroundColor: 'var(--color-surface)',
-                    borderColor: 'var(--color-border)'
-                  }}
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-sm border focus-within:border-[var(--color-text-muted)] transition-colors"
-                >
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    placeholder="Search our store"
-                    style={{
-                      color: 'var(--color-text)',
-                      backgroundColor: 'transparent'
-                    }}
-                    className="w-full text-sm font-normal outline-none placeholder:text-[var(--color-text-light)]"
-                  />
+                {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => props.onSearch?.(searchQuery)}
-                    style={{ color: 'var(--color-text)' }}
-                    className="p-1 hover:opacity-75 transition-opacity"
-                    aria-label="Submit Search"
+                    onClick={() => {
+                      setSearchQuery('');
+                      onSearch?.('');
+                    }}
+                    className="p-1.5 mr-2 text-neutral-400 hover:text-neutral-700 transition-colors rounded-full hover:bg-neutral-100 cursor-pointer"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+
+                <div className="flex items-center gap-2 pl-2 border-l border-neutral-200">
+                  <span className="hidden sm:inline-block text-[10px] font-semibold text-neutral-400 uppercase tracking-widest bg-neutral-100 px-2 py-1 rounded-md">
+                    ESC
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsSearchOpen(false)}
+                    className="p-1.5 text-neutral-400 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100 cursor-pointer"
+                    aria-label="Close search overlay"
+                  >
+                    <X className="w-5 h-5 stroke-[1.8]" />
                   </button>
                 </div>
-              </div>
+              </form>
+            </div>
 
-              {/* Popular Searches Pills */}
-              {props.popularSearch && props.popularSearch.length > 0 && !searchQuery && (
-                <div className="max-w-4xl mx-auto mt-2">
-                  <span
-                    style={{ color: 'var(--color-text)' }}
-                    className="text-xs uppercase tracking-widest block mb-3 font-semibold text-center sm:text-left"
-                  >
-                    POPULAR SEARCHES
-                  </span>
-                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                    {props.popularSearch.map((term, pIdx) => {
-                      const termLabel = typeof term === 'string' ? term : term.name || '';
-                      return (
-                        <button
-                          key={pIdx}
-                          type="button"
-                          onClick={() => handleSelectPopular(termLabel)}
-                          style={{
-                            borderColor: 'var(--color-border)',
-                            color: 'var(--color-text)',
-                            backgroundColor: 'var(--color-surface-light)'
-                          }}
-                          className="text-xs uppercase font-medium px-4 py-1.5 rounded-full border hover:bg-[var(--color-surface)] transition-colors tracking-wider"
-                        >
-                          {termLabel}
-                        </button>
-                      );
-                    })}
+            {/* Scrollable Results & Suggestions Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6">
+              
+              {/* ── Active Live Query View ── */}
+              {searchQuery.trim().length > 0 ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      Live Suggestions for &ldquo;{searchQuery}&rdquo;
+                    </span>
                   </div>
-                </div>
-              )}
 
-              {/* Dynamic Search Results */}
-              {searchQuery && (
-                <div className="mt-8 space-y-8">
-                  {/* Matching Categories */}
-                  {props.searchResults?.categories?.length > 0 && (
-                    <div>
-                      <span
-                        style={{ color: 'var(--color-text-muted)' }}
-                        className="text-xs uppercase tracking-widest block mb-3 font-semibold"
-                      >
-                        Categories
+                  {/* Matching Categories as Refined Chips */}
+                  {searchResults?.categories && searchResults.categories.length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                        Matching Collections
                       </span>
                       <div className="flex flex-wrap gap-2">
-                        {props.searchResults.categories.map((cat) => (
+                        {searchResults.categories.map((cat: any) => (
                           <a
                             key={cat._id}
                             href={`/category/${cat._id}`}
-                            style={{
-                              borderColor: 'var(--color-border)',
-                              color: 'var(--color-text)',
-                              backgroundColor: 'var(--color-surface)'
-                            }}
-                            className="text-xs px-3.5 py-1.5 rounded-md border hover:bg-[var(--color-surface)] transition-colors font-medium"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-neutral-200 hover:bg-neutral-900 hover:text-white transition-all text-neutral-800"
                           >
-                            {cat.name}
+                            <span>{cat.name}</span>
+                            <ArrowUpRight className="w-3 h-3 opacity-60" />
                           </a>
                         ))}
                       </div>
@@ -461,67 +487,109 @@ export default function Layout(props: HeaderProps) {
                   )}
 
                   {/* Matching Products Grid */}
-                  {props.searchResults?.products?.items?.length > 0 && (
-                    <div>
-                      <span
-                        style={{ color: 'var(--color-text-muted)' }}
-                        className="text-xs uppercase tracking-widest block mb-4 font-semibold"
-                      >
-                        Products
+                  {searchResults?.products?.items && searchResults.products.items.length > 0 ? (
+                    <div className="space-y-3">
+                      <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                        Products ({searchResults.products.items.length})
                       </span>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                        {props.searchResults.products.items.map((prod) => (
-                          <a
-                            key={prod._id}
-                            href={`/product/${prod._id}`}
-                            style={{
-                              borderColor: 'var(--color-border)',
-                              backgroundColor: 'var(--color-surface-light)'
-                            }}
-                            className="group flex flex-col border rounded-sm overflow-hidden hover:shadow-md transition-shadow"
-                          >
-                            {prod.media?.coverImage?.sq1_1?.url ? (
-                              <div className="aspect-square w-full overflow-hidden bg-[var(--color-surface)]">
-                                <img
-                                  src={prod.media.coverImage.sq1_1.url}
-                                  alt={prod.title}
-                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                                />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {searchResults.products.items.map((prod: any) => {
+                          const imageUrl =
+                            prod.media?.coverImage?.sq1_1?.url ||
+                            prod.variants?.matrix?.[0]?.media?.url ||
+                            prod.image;
+
+                          return (
+                            <a
+                              key={prod._id}
+                              href={`/product/${prod._id}`}
+                              className="group flex items-center gap-3.5 p-2.5 rounded-xl border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/70 transition-all"
+                            >
+                              <div className="w-14 h-16 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0 relative">
+                                {imageUrl ? (
+                                  <img
+                                    src={imageUrl}
+                                    alt={prod.title}
+                                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                                    <ShoppingBag className="w-5 h-5" />
+                                  </div>
+                                )}
                               </div>
-                            ) : (
-                              <div className="aspect-square w-full bg-[var(--color-surface)] flex items-center justify-center">
-                                <span style={{ color: 'var(--color-text-light)' }} className="text-xs">No image</span>
-                              </div>
-                            )}
-                            <div className="p-3 flex flex-col gap-1">
-                              <p
-                                style={{ color: 'var(--color-text)' }}
-                                className="text-xs font-semibold truncate"
-                              >
-                                {prod.title}
-                              </p>
-                              {prod.pricing?.sale !== undefined && (
-                                <p
-                                  style={{ color: 'var(--color-primary)' }}
-                                  className="text-xs font-bold"
-                                >
-                                  ₹{prod.pricing.sale.toLocaleString('en-IN')}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs sm:text-sm font-medium text-neutral-900 truncate group-hover:underline">
+                                  {prod.title}
                                 </p>
-                              )}
-                            </div>
-                          </a>
-                        ))}
+                                {prod.brand && (
+                                  <p className="text-[11px] text-neutral-400 truncate mt-0.5">
+                                    {prod.brand}
+                                  </p>
+                                )}
+                                {prod.pricing?.sale !== undefined && (
+                                  <p className="text-xs font-semibold text-neutral-900 mt-1">
+                                    ₹ {prod.pricing.sale.toLocaleString('en-IN')}
+                                  </p>
+                                )}
+                              </div>
+                              <ArrowUpRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 flex-shrink-0" />
+                            </a>
+                          );
+                        })}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="py-12 text-center text-xs text-neutral-500">
+                      Press enter to view all catalog matches for &ldquo;
+                      <span className="font-semibold text-neutral-800">
+                        {searchQuery}
+                      </span>
+                      &rdquo;
                     </div>
                   )}
                 </div>
+              ) : (
+                /* ── Idle State with Trendy Pills ── */
+                popularSearch && popularSearch.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                      <TrendingUp className="w-3.5 h-3.5 text-neutral-500" />
+                      <span>Trending Searches</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {popularSearch.map((term: any, pIdx: number) => {
+                        const termLabel =
+                          typeof term === 'string'
+                            ? term
+                            : term.name || term.label || term.query || '';
+
+                        return (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => handleSelectPopular(termLabel)}
+                            className="px-4 py-2 rounded-full text-xs font-medium bg-neutral-200/70 text-neutral-700 hover:bg-neutral-900 hover:text-white transition-all cursor-pointer border border-transparent hover:border-neutral-900 active:scale-95"
+                          >
+                            {termLabel}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )
               )}
 
             </div>
-          </div>
 
-          {/* Backdrop Click Dismiss */}
-          <div className="flex-1" onClick={() => setIsSearchOpen(false)} />
+            {/* Footer Notice */}
+            <div className="px-5 py-3 bg-[#FAF7F2] border-t border-neutral-200 text-[11px] text-neutral-400 flex items-center justify-between">
+              <span>Quick Search Directory</span>
+              <span>Handcrafted Collections</span>
+            </div>
+
+          </div>
         </div>
       )}
 
@@ -532,9 +600,9 @@ export default function Layout(props: HeaderProps) {
             backgroundColor: 'var(--color-surface-contrast)',
             color: 'var(--color-primary-contrast)'
           }}
-          className="lg:hidden fixed inset-x-0 top-[var(--header-height,64px)] bottom-0 z-40 overflow-y-auto p-6 space-y-6 border-t border-white/10"
+          className="lg:hidden fixed inset-x-0 top-[var(--header-height,64px)] bottom-0 z-40 overflow-y-auto p-6 space-y-6 border-t border-white/10 select-none"
         >
-          {props.config?.showSearch && (
+          {config?.showSearch && (
             <button
               type="button"
               onClick={() => {
@@ -542,17 +610,15 @@ export default function Layout(props: HeaderProps) {
                 setIsSearchOpen(true);
               }}
               style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
-              className="w-full text-left py-2.5 px-4 rounded-lg text-sm text-white/70 flex items-center justify-between"
+              className="w-full text-left py-2.5 px-4 rounded-xs text-sm text-white/70 flex items-center justify-between cursor-pointer"
             >
               <span>Search products...</span>
-              <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="w-4 h-4 text-white/50" />
             </button>
           )}
 
           <div className="space-y-4">
-            {props.menu?.map((item, idx) => (
+            {menu?.map((item, idx) => (
               <div key={idx} className="border-b border-white/10 pb-3">
                 <a
                   href={item.href}
@@ -579,9 +645,9 @@ export default function Layout(props: HeaderProps) {
             ))}
           </div>
 
-          {props.topMenuItems && props.topMenuItems.length > 0 && (
+          {topMenuItems && topMenuItems.length > 0 && (
             <div className="pt-2 space-y-2">
-              {props.topMenuItems.map((topItem, tIdx) => (
+              {topMenuItems.map((topItem, tIdx) => (
                 <a
                   key={tIdx}
                   href={topItem.href}
@@ -594,20 +660,26 @@ export default function Layout(props: HeaderProps) {
             </div>
           )}
 
-          {props.config?.showAuth && (
+          {config?.showAuth && (
             <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-              <span>{props.isAuthenticated && props.user?.name ? props.user.name : "My Account"}</span>
-              {props.isAuthenticated ? (
+              <span>
+                {isAuthenticated && user?.name ? user.name : "My Account"}
+              </span>
+              {isAuthenticated ? (
                 <button
                   type="button"
-                  onClick={() => props.logout?.()}
+                  onClick={() => logout?.()}
                   style={{ color: 'var(--color-primary)' }}
-                  className="font-bold underline"
+                  className="font-bold underline cursor-pointer"
                 >
                   Sign Out
                 </button>
               ) : (
-                <a href="/signin" style={{ color: 'var(--color-primary)' }} className="font-bold">
+                <a
+                  href="/signin"
+                  style={{ color: 'var(--color-primary)' }}
+                  className="font-bold"
+                >
                   Sign In
                 </a>
               )}

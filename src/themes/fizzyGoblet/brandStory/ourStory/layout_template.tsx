@@ -49,7 +49,7 @@ export default function Layout(props: LayoutPropType | ComponentPropType) {
       }}
       className="w-full py-6 select-none"
     >
-      <div className="mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* ── 1. Top Centered Header & Narrative ── */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 space-y-3 sm:space-y-4">

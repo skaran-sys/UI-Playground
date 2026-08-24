@@ -45,7 +45,7 @@ export default function Layout(props: LayoutPropType | ComponentPropType) {
       }}
       className="w-full py-6 select-none"
     >
-      <div className="px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 1. Change md:grid-cols-2 to md:grid-cols-10 */}
         <div className="grid grid-cols-1 md:grid-cols-10 gap-8 items-center">
 

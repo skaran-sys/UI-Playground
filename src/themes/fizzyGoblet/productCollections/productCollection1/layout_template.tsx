@@ -83,9 +83,9 @@ export default function Layout(props: CollectionLayoutPropType) {
 
   // Dynamic Carousel Card Width based on card_size
   const carouselWidthClasses: Record<string, string> = {
-    small: "w-[46%] sm:w-[30%] md:w-[22%] lg:w-[calc(16.666%-14px)]",
-    medium: "w-[72%] sm:w-[45%] md:w-[31%] lg:w-[calc(25%-18px)]",
-    large: "w-[85%] sm:w-[60%] md:w-[45%] lg:w-[calc(33.333%-16px)]"
+    small: "w-[48%] sm:w-[30%] md:w-[22%] lg:w-[calc(16.666%-14px)]",
+    medium: "w-[80%] sm:w-[48%] md:w-[31%] lg:w-[calc(25%-18px)]",
+    large: "w-[88%] sm:w-[60%] md:w-[45%] lg:w-[calc(33.333%-16px)]"
   };
   const resolvedCarouselWidth = carouselWidthClasses[config?.card_size || "medium"] || carouselWidthClasses.medium;
 
@@ -102,7 +102,7 @@ export default function Layout(props: CollectionLayoutPropType) {
       }}
       className="w-full py-4 select-none"
     >
-      <div className="px-8 mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* ── 1. Section Header ── */}
         {config?.show_header && (
