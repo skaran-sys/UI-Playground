@@ -1,43 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  /* ==========================
-     Background
-     ========================== */
-  --color-background: #FBF7F1;       /* warm ivory, matches product photography backdrop */
 
-  /* ==========================
-     Surface
-     ========================== */
-  --color-surface: #F3EBDD;          /* soft sand/beige, sits between bg and cards */
-  --color-surface-light: #FFFDF9;    /* near-white card surface */
-  --color-surface-lighter: #F7F2EA;  /* subtle hover/alt row surface */
-  --color-surface-contrast: #1A1410; /* deep espresso-black for contrast blocks */
+   /* Fizzy Goblet Theme */
+   /* --color-background: #FBF7F1;
+   --color-surface: #F3EBDD;
+   --color-surface-light: #FFFDF9;
+   --color-surface-lighter: #F7F2EA;
+   --color-surface-contrast: #1A1410;
 
-  /* ==========================
-     Primary
-     ========================== */
- --color-primary: #E8A2A2;          /* base — Fizzy Goblet rose */
---color-primary-light: #EFBCBC;    /* lighter tint, hover states */
---color-primary-lighter: #F7DEDE;  /* palest tint, subtle fills/badges */  /* muted rose, tags/badges */
-  --color-primary-contrast: #FFFFFF;
+   --color-primary: #E8A2A2;
+   --color-primary-light: #EFBCBC;
+   --color-primary-lighter: #F7DEDE;
+   --color-primary-contrast: #FFFFFF;
 
-  /* ==========================
-     Text
-     ========================== */
-  --color-text: #221A15;             /* warm near-black, softer than pure #111 */
-  --color-text-muted: #6E6259;
-  --color-text-light: #A69A8C;
-  --color-text-inverse: #FFFFFF;
+   --color-text: #221A15;
+   --color-text-muted: #6E6259;
+   --color-text-light: #A69A8C;
+   --color-text-inverse: #FFFFFF;
 
-  /* ==========================
-     Border
-     ========================== */
-  --color-border: #E8DFD1;           /* warm neutral border, ties to surface tones */
+   --color-border: #E8DFD1; */
+
+   /* Dot & key Theme */
+   --color-background: #FFFFFF;
+   --color-surface: #FFF0F5;
+   --color-surface-light: #FFFFFF;
+   --color-surface-lighter: #FDF2F6;
+   --color-surface-contrast: #1A0E14;
+
+   --color-primary: #EC1E63;
+   --color-primary-light: #F14D82;
+   --color-primary-lighter: #FBD5E3;
+   --color-primary-contrast: #FFFFFF;
+
+   --color-text: #1A0E14;
+   --color-text-muted: #6B5A61;
+   --color-text-light: #A38F97;
+   --color-text-inverse: #FFFFFF;
+
+   --color-border: #F0DDE4;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-text);
-  font-family: Arial, Helvetica, sans-serif;
+   /* Fizzy Goblet Theme */
+   /* 
+   background: var(--color-background);
+   color: var(--color-text);
+   font-family: Arial, Helvetica, sans-serif; */
+
+   /* Dot & key Theme */
+   background: var(--color-background);
+   color: var(--color-text);
+   font-family: Arial, Helvetica, sans-serif;
 }

@@ -107,6 +107,7 @@ export interface ProductReview {
   createdAt: string;
 
   review: ProductReviewContent;
+  customerImage?: string;
 }
 
 export interface ProductDetailProps {

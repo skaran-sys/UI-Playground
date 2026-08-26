@@ -1,91 +1,93 @@
 export type MenuItem = {
-  label: string
-  href: string,
-  subMenu?: { label: string, href: string }[]
-}
+  label: string;
+  href: string;
+  subMenu?: { label: string; href: string }[];
+};
 
 export interface CategoryReference {
-  _id: string
-  name: string
+  _id: string;
+  name: string;
 }
 
 export interface Category {
-  _id: string
-  name: string
-  parent?: CategoryReference
-  children?: CategoryReference[]
+  _id: string;
+  name: string;
+  parent?: CategoryReference;
+  children?: CategoryReference[];
 }
 
 export type Product = {
-  _id: string
-  title: string
-  brand?: string
+  _id: string;
+  title: string;
+  brand?: string;
   media?: {
     coverImage?: {
-      sq1_1?: { url: string }
-    }
-  }
+      sq1_1?: { url: string };
+    };
+  };
   variants?: {
-    matrix?: { media?: { url: string } }[]
-  }
+    matrix?: { media?: { url: string } }[];
+  };
   pricing?: {
-    sale?: number
-  }
-}
+    sale?: number;
+  };
+};
 
 export type SearchResult = {
-  categories: Category[]
+  categories: Category[];
   products: {
-    items: Product[]
-  }
-}
+    items: Product[];
+  };
+};
 
 export type RecommendationSection = {
-  label: string
-  items: string[]
-  deleteApi?: string
-}
+  label: string;
+  items: string[];
+  deleteApi?: string;
+};
 
 export type SearchBoxProps = {
-  onSearch: (query: string) => void; 
-  onDeleteRecommendation: (id: string) => void; 
-  loadRecommendations: () => void; 
-  result: {
-    categories: any[],
-    products: { items: any[] },
-  }
-  popular: any[],
-}
+  onSearch: (query: string) => void;
+  onDeleteRecommendation?: (id: string) => void;
+  loadRecommendations?: () => void;
+  result?: {
+    categories: any[];
+    products: { items: any[] };
+  };
+  popular?: any[];
+  placeholder?: string;
+};
 
 export type HeaderProps = {
-  wishlistCount?: number
-  cartCount?: number
-  isAuthenticated?: boolean
-  topMenuItems?: MenuItem[]
-  logoUrl: string
+  wishlistCount?: number;
+  cartCount?: number;
+  isAuthenticated?: boolean;
+  topMenuItems?: MenuItem[];
+  logoUrl: string;
   config: {
-    layout_id: string,
-    showSearch: boolean
-    showWishlist: boolean
-    showCart: boolean
-    showAuth: boolean
-    fixed: boolean
-    announcement: string | null
-  }
-  user: any
-  logout: any
+    layout_id: string;
+    showSearch: boolean;
+    showWishlist: boolean;
+    showCart: boolean;
+    showAuth: boolean;
+    fixed: boolean;
+    announcement: string[] | string | null;
+    searchPlaceholder?: string;
+  };
+  user: any;
+  logout: any;
   storeName: string;
-  onSearch: (query: string) => void; 
-  onDeleteRecommendation: (id: string) => void; 
-  loadRecommendations: () => void; 
+  onSearch: (query: string) => void;
+  onDeleteRecommendation?: (id: string) => void;
+  loadRecommendations?: () => void;
   onCartToggle?: () => void;
   searchResults: {
-    categories: any[],
-    products: { items: any[] }
-  }
-  popularSearch: any[]
-  menu: MenuItem[]
-  wishlistHref?: string
-  cartHref?: string
-  accountHref?: string
-}
+    categories: any[];
+    products: { items: any[] };
+  };
+  popularSearch: any[];
+  menu: MenuItem[];
+  wishlistHref?: string;
+  cartHref?: string;
+  accountHref?: string;
+};

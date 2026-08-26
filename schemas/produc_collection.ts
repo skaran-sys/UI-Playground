@@ -14,6 +14,13 @@ export type Item = {
   discount: string;
   badge: string;
   link?: string;
+  video_url?: string;
+  variants?: {
+    label: string;
+    id: string;
+    price: string;
+    color?: string;
+  }[];
 };
 
 export interface Config extends ConfigType {
@@ -35,4 +42,8 @@ export interface CollectionLayoutPropType {
   items?: Item[];
   config: Config;
   isLoading: boolean;
+  addToCart: (id: string, qty: number, variantId?: string) => void;
+  addToWishlist: (id: string) => void;
+  updateQuantity: (id: string, qty: number, variantId?: string) => void;
+  isWishlisted: (id: string) => boolean;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+/* Fizzy Goblet Imports */
 import HeaderLayout from "@/themes/fizzyGoblet/header/layout_template";
 import FooterLayout from "@/themes/fizzyGoblet/footer/layout_template";
 import sampleFooterProps from "@/themes/fizzyGoblet/footer/props.sample";
@@ -16,13 +17,13 @@ import sampleAboutUsProps from "@/themes/fizzyGoblet/aboutUs/props.sample";
 import TestimonialsLayout from "@/themes/fizzyGoblet/testimonials/layout_template";
 import sampleTestimonialsProps from "@/themes/fizzyGoblet/testimonials/props.sample";
 import MainCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/mainCategory/layout_template";
-import sampleMainCategoryProps from "@/themes/fizzyGoblet/categoryCollections/mainCategory/props.sample"
+import sampleMainCategoryProps from "@/themes/fizzyGoblet/categoryCollections/mainCategory/props.sample";
 import ShopByCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/layout_template";
-import sampleShopByCategoryProps from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/props.sample"
+import sampleShopByCategoryProps from "@/themes/fizzyGoblet/categoryCollections/shopByCategory/props.sample";
 import AccessoryCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/layout_template";
-import sampleAccessoryCategoryProps from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/props.sample"
+import sampleAccessoryCategoryProps from "@/themes/fizzyGoblet/categoryCollections/accessoryCategory/props.sample";
 import GridCategoryLayout from "@/themes/fizzyGoblet/categoryCollections/gridCategory/layout_template";
-import sampleGridCategoryProps from "@/themes/fizzyGoblet/categoryCollections/gridCategory/props.sample"
+import sampleGridCategoryProps from "@/themes/fizzyGoblet/categoryCollections/gridCategory/props.sample";
 import ProductCollectionLayout from "@/themes/fizzyGoblet/productCollections/productCollection1/layout_template";
 import sampleProductCollectionProps from "@/themes/fizzyGoblet/productCollections/productCollection1/props.samples";
 import WishlistLayout from "@/themes/fizzyGoblet/wishList/layout_template";
@@ -31,12 +32,23 @@ import ProductDetailLayout from "@/themes/fizzyGoblet/productDetails/layout_temp
 import sampleProductDetailProps from "@/themes/fizzyGoblet/productDetails/props.sample";
 import ProductListingLayout from "@/themes/fizzyGoblet/productListing/layout_template";
 import sampleProductListingProps from "@/themes/fizzyGoblet/productListing/props.sample";
-
 import CartLayout from "@/themes/fizzyGoblet/cart/layout_template";
 import sampleCartProps from "@/themes/fizzyGoblet/cart/props.sample";
 
+/* Dot & Key Imports */
+import DotAndKeyHeaderLayout from "@/themes/DotAndkey/header/layout_template";
+import sampleDotAndKeyHeaderProps from "@/themes/DotAndkey/header/props.sample";
+import DotAndKeyHeroLayout from "@/themes/DotAndkey/hero/layout_template";
+import sampleDotAndKeyHeroProps from "@/themes/DotAndkey/hero/props.sample";
+import DotAndKeyProductCollectionLayout from "@/themes/DotAndkey/productCollections/productCollection1/layout_template";
+import sampleDotAndKeyProductCollectionProps from "@/themes/DotAndkey/productCollections/productCollection1/props.samples";
+import DotAndKeyProductVideoCollectionLayout from "@/themes/DotAndkey/productCollections/productVideoCollection2/layout_template";
+import sampleDotAndKeyProductVideoCollectionProps from "@/themes/DotAndkey/productCollections/productVideoCollection2/props.samples";
+import DotAndKeyAppBannerLayout from "@/themes/DotAndkey/appBanner/layout_template";
+import sampleDotAndKeyAppBannerProps from "@/themes/DotAndkey/appBanner/props.sample";
+
 export default function PlaygroundPage() {
-  const [activeTheme] = useState<string>("fizzyGoblet");
+  const [activeTheme, setActiveTheme] = useState<"fizzyGoblet" | "dotAndKey">("dotAndKey");
   const [activeComponent, setActiveComponent] = useState<"header" | "hero" | "cart" | "all">("all");
   const [activeTab, setActiveTab] = useState<"ui" | "props">("ui");
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
@@ -49,91 +61,159 @@ export default function PlaygroundPage() {
         color: "var(--color-text)",
       }}
     >
+      {/* Top Floating Theme Switcher Controls */}
+      {/* <header className="sticky top-0 z-[60] bg-neutral-900/90 backdrop-blur-md text-white px-4 py-2 flex items-center justify-center border-b border-neutral-800 text-xs shadow-md">
+        <div className="flex items-center gap-2">
+          <span className="text-neutral-400 font-medium">Active Theme:</span>
+          <div className="inline-flex p-0.5 bg-neutral-800 rounded-md">
+            <button
+              type="button"
+              onClick={() => setActiveTheme("fizzyGoblet")}
+              className={`px-3 py-1 rounded-sm font-semibold transition-colors cursor-pointer ${
+                activeTheme === "fizzyGoblet"
+                  ? "bg-white text-black shadow-xs"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Fizzy Goblet
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTheme("dotAndKey")}
+              className={`px-3 py-1 rounded-sm font-semibold transition-colors cursor-pointer ${
+                activeTheme === "dotAndKey"
+                  ? "bg-white text-black shadow-xs"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Dot & Key
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("ui")}
+            className={`px-2.5 py-1 rounded-xs cursor-pointer ${
+              activeTab === "ui" ? "bg-neutral-700 text-white font-bold" : "text-neutral-400"
+            }`}
+          >
+            UI
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("props")}
+            className={`px-2.5 py-1 rounded-xs cursor-pointer ${
+              activeTab === "props" ? "bg-neutral-700 text-white font-bold" : "text-neutral-400"
+            }`}
+          >
+            Props JSON
+          </button>
+        </div>
+      </header> */}
 
       {/* Main Canvas */}
       <main className="relative">
         {activeTab === "ui" ? (
-          <div className="space-y-0">
-            {(activeComponent === "all" || activeComponent === "header") && (
-              <HeaderLayout {...sampleHeaderProps} />
-            )}
+          activeTheme === "fizzyGoblet" ? (
+            /* Fizzy Goblet Full Suite */
+            <div className="space-y-0">
+              {(activeComponent === "all" || activeComponent === "header") && (
+                <HeaderLayout {...sampleHeaderProps} />
+              )}
 
-            {(activeComponent === "all" || activeComponent === "hero") && (
-              <HeroLayout {...sampleHeroProps} />
-            )}
+              {(activeComponent === "all" || activeComponent === "hero") && (
+                <HeroLayout {...sampleHeroProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <ProductListingLayout {...sampleProductListingProps} />
-            )}
+              {activeComponent === "all" && (
+                <ProductListingLayout {...sampleProductListingProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <ProductDetailLayout {...sampleProductDetailProps} />
-            )}
+              {activeComponent === "all" && (
+                <ProductDetailLayout {...sampleProductDetailProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <MainCategoryLayout {...sampleMainCategoryProps} />
-            )}
-            {(activeComponent === "all") && (
-              <ProductCollectionLayout {...sampleProductCollectionProps} />
-            )}
+              {activeComponent === "all" && (
+                <MainCategoryLayout {...sampleMainCategoryProps} />
+              )}
+              {activeComponent === "all" && (
+                <ProductCollectionLayout {...sampleProductCollectionProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <ProductCollectionLayout {...sampleProductCollectionProps} />
-            )}
+              {activeComponent === "all" && (
+                <ProductCollectionLayout {...sampleProductCollectionProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <ShopByCategoryLayout {...sampleShopByCategoryProps} />
-            )}
+              {activeComponent === "all" && (
+                <ShopByCategoryLayout {...sampleShopByCategoryProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <AccessoryCategoryLayout {...sampleAccessoryCategoryProps} />
-            )}
+              {activeComponent === "all" && (
+                <AccessoryCategoryLayout {...sampleAccessoryCategoryProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <ProductCollectionLayout {...sampleProductCollectionProps} />
-            )}
+              {activeComponent === "all" && (
+                <ProductCollectionLayout {...sampleProductCollectionProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <GridCategoryLayout {...sampleGridCategoryProps} />
-            )}
+              {activeComponent === "all" && (
+                <GridCategoryLayout {...sampleGridCategoryProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <OurStorySectionLayout {...sampleOurStoryProps} />
-            )}
+              {activeComponent === "all" && (
+                <OurStorySectionLayout {...sampleOurStoryProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <BrandStoryLayout {...sampleBrandStoryProps} />
-            )}
+              {activeComponent === "all" && (
+                <BrandStoryLayout {...sampleBrandStoryProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <AboutUsLayout {...sampleAboutUsProps} />
-            )}
+              {activeComponent === "all" && (
+                <AboutUsLayout {...sampleAboutUsProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <WishlistLayout {...sampleWishlistProps} />
-            )}
+              {activeComponent === "all" && (
+                <WishlistLayout {...sampleWishlistProps} />
+              )}
 
-            {(activeComponent === "all") && (
-              <TestimonialsLayout {...sampleTestimonialsProps} />
-            )}
+              {activeComponent === "all" && (
+                <TestimonialsLayout {...sampleTestimonialsProps} />
+              )}
 
-            <button className="bg-red-500 text-white px-4 py-2 text-xs font-semibold m-4 rounded" onClick={() => { setIsCartOpen(true) }}>
-              Open cart
-            </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 text-xs font-semibold m-4 rounded cursor-pointer"
+                onClick={() => {
+                  setIsCartOpen(true);
+                }}
+              >
+                Open cart
+              </button>
 
-            {(activeComponent === "all") && (
-              <FooterLayout {...sampleFooterProps} />
-            )}
+              {activeComponent === "all" && (
+                <FooterLayout {...sampleFooterProps} />
+              )}
 
-            {/* Slide-over Right Cart Drawer with Left Dark Translucent Overlay */}
-            {isCartOpen && (
-              <CartLayout
-                {...sampleCartProps}
-                isSidebar={true}
-                onClose={() => setIsCartOpen(false)}
-              />
-            )}
-          </div>
+              {/* Slide-over Right Cart Drawer */}
+              {isCartOpen && (
+                <CartLayout
+                  {...sampleCartProps}
+                  isSidebar={true}
+                  onClose={() => setIsCartOpen(false)}
+                />
+              )}
+            </div>
+          ) : (
+            /* Dot & Key Theme Suite */
+            <div className="space-y-0">
+              <DotAndKeyHeaderLayout {...sampleDotAndKeyHeaderProps} />
+              <DotAndKeyHeroLayout {...sampleDotAndKeyHeroProps} />
+              <DotAndKeyProductCollectionLayout {...sampleDotAndKeyProductCollectionProps} />
+              <DotAndKeyProductVideoCollectionLayout {...sampleDotAndKeyProductVideoCollectionProps} />
+              <DotAndKeyAppBannerLayout {...sampleDotAndKeyAppBannerProps} />
+            </div>
+          )
         ) : (
           /* Props JSON Inspector */
           <div
@@ -144,18 +224,26 @@ export default function PlaygroundPage() {
               color: "var(--color-primary)",
             }}
           >
-            <div className="pb-3 mb-3 border-b font-sans text-sm font-bold" style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}>
-              Active Props Sample for: <span className="font-mono uppercase" style={{ color: "var(--color-primary)" }}>{activeComponent}</span>
+            <div
+              className="pb-3 mb-3 border-b font-sans text-sm font-bold"
+              style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}
+            >
+              Active Props Sample for Theme:{" "}
+              <span className="font-mono uppercase" style={{ color: "var(--color-primary)" }}>
+                {activeTheme}
+              </span>
             </div>
             <pre>
               {JSON.stringify(
-                activeComponent === "header"
-                  ? sampleHeaderProps
-                  : activeComponent === "hero"
-                    ? sampleHeroProps
-                    : activeComponent === "cart"
-                      ? sampleCartProps
-                      : { header: sampleHeaderProps, hero: sampleHeroProps, cart: sampleCartProps },
+                activeTheme === "fizzyGoblet"
+                  ? { header: sampleHeaderProps, hero: sampleHeroProps, cart: sampleCartProps }
+                  : {
+                      header: sampleDotAndKeyHeaderProps,
+                      hero: sampleDotAndKeyHeroProps,
+                      productCollection: sampleDotAndKeyProductCollectionProps,
+                      productVideoCollection: sampleDotAndKeyProductVideoCollectionProps,
+                      appBanner: sampleDotAndKeyAppBannerProps,
+                    },
                 null,
                 2
               )}
