@@ -40,12 +40,28 @@ import DotAndKeyHeaderLayout from "@/themes/DotAndkey/header/layout_template";
 import sampleDotAndKeyHeaderProps from "@/themes/DotAndkey/header/props.sample";
 import DotAndKeyHeroLayout from "@/themes/DotAndkey/hero/layout_template";
 import sampleDotAndKeyHeroProps from "@/themes/DotAndkey/hero/props.sample";
+import DotAndKeyProductDetailLayout from "@/themes/DotAndkey/productDetails/layout_template";
+import sampleDotAndKeyProductDetailProps from "@/themes/DotAndkey/productDetails/props.sample";
+import DotAndKeyProductListingLayout from "@/themes/DotAndkey/productListing/layout_template";
+import sampleDotAndKeyProductListingProps from "@/themes/DotAndkey/productListing/props.sample";
+import DotAndKeyExploreRangeCategoryLayout from "@/themes/DotAndkey/categoryCollections/exploreRangeCategory/layout_template";
+import sampleDotAndKeyExploreRangeProps from "@/themes/DotAndkey/categoryCollections/exploreRangeCategory/props.sample";
 import DotAndKeyProductCollectionLayout from "@/themes/DotAndkey/productCollections/productCollection1/layout_template";
 import sampleDotAndKeyProductCollectionProps from "@/themes/DotAndkey/productCollections/productCollection1/props.samples";
 import DotAndKeyProductVideoCollectionLayout from "@/themes/DotAndkey/productCollections/productVideoCollection2/layout_template";
 import sampleDotAndKeyProductVideoCollectionProps from "@/themes/DotAndkey/productCollections/productVideoCollection2/props.samples";
+import DotAndKeyAboutUsLayout from "@/themes/DotAndkey/aboutUs/layout_template";
+import sampleDotAndKeyAboutUsProps from "@/themes/DotAndkey/aboutUs/props.sample";
+import DotAndKeyProductReviewsLayout from "@/themes/DotAndkey/productReviews/layout_template";
+import sampleDotAndKeyProductReviewsProps from "@/themes/DotAndkey/productReviews/props.sample";
+import DotAndKeyBrandPromisesLayout from "@/themes/DotAndkey/brandPromises/layout_template";
+import sampleDotAndKeyBrandPromiseProps from "@/themes/DotAndkey/brandPromises/props.sample";
 import DotAndKeyAppBannerLayout from "@/themes/DotAndkey/appBanner/layout_template";
 import sampleDotAndKeyAppBannerProps from "@/themes/DotAndkey/appBanner/props.sample";
+import DotAndKeyFooterLayout from "@/themes/DotAndkey/footer/layout_template";
+import sampleDotAndKeyFooterProps from "@/themes/DotAndkey/footer/props.sample";
+import DotAndKeyCartLayout from "@/themes/DotAndkey/cart/layout_template";
+import sampleDotAndKeyCartProps from "@/themes/DotAndkey/cart/props.sample";
 
 export default function PlaygroundPage() {
   const [activeTheme, setActiveTheme] = useState<"fizzyGoblet" | "dotAndKey">("dotAndKey");
@@ -207,11 +223,30 @@ export default function PlaygroundPage() {
           ) : (
             /* Dot & Key Theme Suite */
             <div className="space-y-0">
-              <DotAndKeyHeaderLayout {...sampleDotAndKeyHeaderProps} />
+              <DotAndKeyHeaderLayout
+                {...sampleDotAndKeyHeaderProps}
+                onCartToggle={() => setIsCartOpen(true)}
+              />
               <DotAndKeyHeroLayout {...sampleDotAndKeyHeroProps} />
+              <DotAndKeyProductDetailLayout {...sampleDotAndKeyProductDetailProps} />
+              <DotAndKeyProductListingLayout {...sampleDotAndKeyProductListingProps} />
+              <DotAndKeyExploreRangeCategoryLayout {...sampleDotAndKeyExploreRangeProps} />
               <DotAndKeyProductCollectionLayout {...sampleDotAndKeyProductCollectionProps} />
               <DotAndKeyProductVideoCollectionLayout {...sampleDotAndKeyProductVideoCollectionProps} />
+              <DotAndKeyAboutUsLayout {...sampleDotAndKeyAboutUsProps} />
+              <DotAndKeyProductReviewsLayout {...sampleDotAndKeyProductReviewsProps} />
+              <DotAndKeyBrandPromisesLayout {...sampleDotAndKeyBrandPromiseProps} />
               <DotAndKeyAppBannerLayout {...sampleDotAndKeyAppBannerProps} />
+              <DotAndKeyFooterLayout {...sampleDotAndKeyFooterProps} />
+
+              {/* Slide-over Right Cart Drawer */}
+              {isCartOpen && (
+                <DotAndKeyCartLayout
+                  {...sampleDotAndKeyCartProps}
+                  isSidebar={true}
+                  onClose={() => setIsCartOpen(false)}
+                />
+              )}
             </div>
           )
         ) : (
@@ -240,9 +275,17 @@ export default function PlaygroundPage() {
                   : {
                       header: sampleDotAndKeyHeaderProps,
                       hero: sampleDotAndKeyHeroProps,
+                      productDetail: sampleDotAndKeyProductDetailProps,
+                      productListing: sampleDotAndKeyProductListingProps,
+                      exploreRangeCategory: sampleDotAndKeyExploreRangeProps,
                       productCollection: sampleDotAndKeyProductCollectionProps,
                       productVideoCollection: sampleDotAndKeyProductVideoCollectionProps,
+                      aboutUs: sampleDotAndKeyAboutUsProps,
+                      productReviews: sampleDotAndKeyProductReviewsProps,
+                      brandPromises: sampleDotAndKeyBrandPromiseProps,
                       appBanner: sampleDotAndKeyAppBannerProps,
+                      footer: sampleDotAndKeyFooterProps,
+                      cart: sampleDotAndKeyCartProps,
                     },
                 null,
                 2
