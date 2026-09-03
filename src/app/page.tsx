@@ -63,8 +63,24 @@ import sampleDotAndKeyFooterProps from "@/themes/DotAndkey/footer/props.sample";
 import DotAndKeyCartLayout from "@/themes/DotAndkey/cart/layout_template";
 import sampleDotAndKeyCartProps from "@/themes/DotAndkey/cart/props.sample";
 
+/* Eye Lounge Imports */
+import EyeLoungeHeaderLayout from "@/themes/eyeLoungeOnline/header/layout_template";
+import sampleEyeLoungeHeaderProps from "@/themes/eyeLoungeOnline/header/props.sample";
+import EyeLoungeHeroLayout from "@/themes/eyeLoungeOnline/hero/layout_template";
+import sampleEyeLoungeHeroProps from "@/themes/eyeLoungeOnline/hero/props.sample";
+import EyeLoungeMainCategoryLayout from "@/themes/eyeLoungeOnline/categoryCollections/mainCategory/layout_template";
+import sampleEyeLoungeMainCategoryProps from "@/themes/eyeLoungeOnline/categoryCollections/mainCategory/props.sample";
+import EyeLoungeProductCollectionLayout from "@/themes/eyeLoungeOnline/productCollections/layout_template";
+import sampleEyeLoungeProductCollectionProps from "@/themes/eyeLoungeOnline/productCollections/props.samples";
+import EyeLoungeBrandStoryLayout from "@/themes/eyeLoungeOnline/brandStory/layout_template";
+import sampleEyeLoungeBrandStoryProps from "@/themes/eyeLoungeOnline/brandStory/props.sample";
+import EyeLoungeBrandPromisesLayout from "@/themes/eyeLoungeOnline/brandPromises/layout_template";
+import sampleEyeLoungeBrandPromisesProps from "@/themes/eyeLoungeOnline/brandPromises/props.sample";
+import EyeLoungeFooterLayout from "@/themes/eyeLoungeOnline/footer/layout_template";
+import sampleEyeLoungeFooterProps from "@/themes/eyeLoungeOnline/footer/props.sample";
+
 export default function PlaygroundPage() {
-  const [activeTheme, setActiveTheme] = useState<"fizzyGoblet" | "dotAndKey">("dotAndKey");
+  const [activeTheme, setActiveTheme] = useState<"fizzyGoblet" | "dotAndKey" | "eyeLounge">("eyeLounge");
   const [activeComponent, setActiveComponent] = useState<"header" | "hero" | "cart" | "all">("all");
   const [activeTab, setActiveTab] = useState<"ui" | "props">("ui");
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
@@ -220,7 +236,7 @@ export default function PlaygroundPage() {
                 />
               )}
             </div>
-          ) : (
+          ) : activeTheme === "dotAndKey" ? (
             /* Dot & Key Theme Suite */
             <div className="space-y-0">
               <DotAndKeyHeaderLayout
@@ -248,6 +264,20 @@ export default function PlaygroundPage() {
                 />
               )}
             </div>
+          ) : (
+            /* Eye Lounge Theme Suite */
+            <div className="space-y-0">
+              <EyeLoungeHeaderLayout
+                {...sampleEyeLoungeHeaderProps}
+                onCartToggle={() => setIsCartOpen(true)}
+              />
+              <EyeLoungeHeroLayout {...sampleEyeLoungeHeroProps} />
+              <EyeLoungeMainCategoryLayout {...sampleEyeLoungeMainCategoryProps} />
+              <EyeLoungeProductCollectionLayout {...sampleEyeLoungeProductCollectionProps} />
+              <EyeLoungeBrandStoryLayout {...sampleEyeLoungeBrandStoryProps} />
+              <EyeLoungeBrandPromisesLayout {...sampleEyeLoungeBrandPromisesProps} />
+              <EyeLoungeFooterLayout {...sampleEyeLoungeFooterProps} />
+            </div>
           )
         ) : (
           /* Props JSON Inspector */
@@ -272,7 +302,8 @@ export default function PlaygroundPage() {
               {JSON.stringify(
                 activeTheme === "fizzyGoblet"
                   ? { header: sampleHeaderProps, hero: sampleHeroProps, cart: sampleCartProps }
-                  : {
+                  : activeTheme === "dotAndKey"
+                  ? {
                       header: sampleDotAndKeyHeaderProps,
                       hero: sampleDotAndKeyHeroProps,
                       productDetail: sampleDotAndKeyProductDetailProps,
@@ -286,6 +317,15 @@ export default function PlaygroundPage() {
                       appBanner: sampleDotAndKeyAppBannerProps,
                       footer: sampleDotAndKeyFooterProps,
                       cart: sampleDotAndKeyCartProps,
+                    }
+                  : {
+                      header: sampleEyeLoungeHeaderProps,
+                      hero: sampleEyeLoungeHeroProps,
+                      mainCategory: sampleEyeLoungeMainCategoryProps,
+                      productCollection: sampleEyeLoungeProductCollectionProps,
+                      brandStory: sampleEyeLoungeBrandStoryProps,
+                      brandPromises: sampleEyeLoungeBrandPromisesProps,
+                      footer: sampleEyeLoungeFooterProps,
                     },
                 null,
                 2

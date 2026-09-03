@@ -22,7 +22,7 @@
    --color-border: #E8DFD1; */
 
    /* Dot & key Theme */
-   --color-background: #FFFFFF;
+   /* --color-background: #FFFFFF;
    --color-surface: #FFF0F5;
    --color-surface-light: #FFFFFF;
    --color-surface-lighter: #FDF2F6;
@@ -38,7 +38,31 @@
    --color-text-light: #A38F97;
    --color-text-inverse: #FFFFFF;
 
-   --color-border: #F0DDE4;
+   --color-border: #F0DDE4; */
+
+   /* Eye Lounge Theme */
+   --color-background: #FFFFFF;
+   --color-surface: #F5F5F5;
+   --color-surface-light: #FFFFFF;
+   --color-surface-lighter: #FAFAFA;
+   --color-surface-contrast: #000000;
+
+   --color-secondary: #4A4A4A;
+   --color-secondary-light: #6B6B6B;
+   --color-secondary-lighter: #D9D9D9;
+   --color-secondary-contrast: #FFFFFF;
+
+   --color-primary: #000000;
+   --color-primary-light: #2B2B2B;
+   --color-primary-lighter: #E5E5E5;
+   --color-primary-contrast: #FFFFFF;
+
+   --color-text: #111111;
+   --color-text-muted: #666666;
+   --color-text-light: #999999;
+   --color-text-inverse: #FFFFFF;
+
+   --color-border: #E0E0E0;
 }
 
 body {
@@ -49,6 +73,12 @@ body {
    font-family: Arial, Helvetica, sans-serif; */
 
    /* Dot & key Theme */
+   /* 
+   background: var(--color-background);
+   color: var(--color-text);
+   font-family: Arial, Helvetica, sans-serif; */
+
+   /* Eye Lounge Theme */
    background: var(--color-background);
    color: var(--color-text);
    font-family: Arial, Helvetica, sans-serif;

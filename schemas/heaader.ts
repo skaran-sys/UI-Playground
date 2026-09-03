@@ -1,9 +1,30 @@
+/* ── Mega Menu Extensions ── */
+export interface MegaMenuProduct {
+  _id: string;
+  brand: string;
+  model: string;
+  price: string | number;
+  image: string;
+  hoverImage?: string;
+  href: string;
+}
+
+export interface BrandColumn {
+  title: string;
+  brands: { label: string; href: string }[];
+}
+
+/* ── Navigation Menu Item ── */
 export type MenuItem = {
   label: string;
   href: string;
+  type?: 'default' | 'product_grid' | 'brand_columns';
   subMenu?: { label: string; href: string }[];
+  featuredProducts?: MegaMenuProduct[];
+  brandColumns?: BrandColumn[];
 };
 
+/* ── Category Models ── */
 export interface CategoryReference {
   _id: string;
   name: string;
@@ -73,6 +94,7 @@ export type HeaderProps = {
     fixed: boolean;
     announcement: string[] | string | null;
     searchPlaceholder?: string;
+    [key: string]: any;
   };
   user: any;
   logout: any;
