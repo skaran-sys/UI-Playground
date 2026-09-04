@@ -170,11 +170,10 @@ export default function Layout(props: HeaderProps) {
     if (onSearch) onSearch(val);
   };
 
-  const handleCartClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (onCartToggle) onCartToggle();
-    setActiveDrawer('cart');
-  };
+ const handleCartClick = (e: React.MouseEvent) => {
+  e.preventDefault();
+  if (onCartToggle) onCartToggle();
+};
 
   const handleAccountClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -770,69 +769,6 @@ export default function Layout(props: HeaderProps) {
               </a>
             </div>
           </form>
-        </div>
-      </aside>
-
-      {/* ── DRAWER 3: Shopping Cart (Empty State) ── */}
-      <aside
-        style={{ backgroundColor: 'var(--color-surface-light, #FFFFFF)' }}
-        className={`fixed top-0 right-0 h-full w-full max-w-[420px] z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
-          activeDrawer === 'cart' ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <div
-          style={{ borderColor: 'var(--color-border, #E0E0E0)' }}
-          className="flex items-center justify-between px-6 py-5 border-b"
-        >
-          <h2
-            style={{ color: 'var(--color-text, #111111)' }}
-            className="text-xs sm:text-[13px] font-bold tracking-widest uppercase"
-          >
-            SHOPPING CART
-          </h2>
-          <button
-            type="button"
-            onClick={closeDrawer}
-            style={{ color: 'var(--color-text-muted, #666666)' }}
-            className="hover:opacity-70 p-1 cursor-pointer"
-            aria-label="Close cart"
-          >
-            <X className="w-5 h-5 stroke-[1.8]" />
-          </button>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-          <div
-            style={{ color: 'var(--color-text-light, #999999)' }}
-            className="relative mb-5"
-          >
-            <ShoppingBag className="w-14 h-14 stroke-[1.2]" />
-            <span
-              style={{ color: 'var(--color-text-muted, #666666)' }}
-              className="absolute inset-0 flex items-center justify-center pt-2 font-black text-xs"
-            >
-              ✕
-            </span>
-          </div>
-
-          <p
-            style={{ color: 'var(--color-text-muted, #666666)' }}
-            className="text-xs sm:text-sm mb-6 font-normal"
-          >
-            Your cart is empty.
-          </p>
-
-          <a
-            href="/collections/all"
-            onClick={closeDrawer}
-            style={{
-              backgroundColor: 'var(--color-primary, #000000)',
-              color: 'var(--color-primary-contrast, #FFFFFF)'
-            }}
-            className="px-8 py-3 rounded-full text-xs font-bold tracking-wider uppercase hover:opacity-90 active:scale-98 transition-all cursor-pointer inline-block"
-          >
-            RETURN TO SHOP
-          </a>
         </div>
       </aside>
     </>

@@ -1,92 +1,143 @@
 import { LayoutProps } from './layout_template';
 
 export const mockWishlistProps: LayoutProps = {
-  loading: false,
   config: {
-    layout_id: "d2c_luxury_wishlist_page_v1",
-    title: "My Wishlist",
-    share_button_text: "Share Wishlist",
-    clear_all_text: "Clear All",
-    cta_label: "Add To Bag"
+    layout_id: "eye_lounge_wishlist_v1",
+    title: "Wishlist"
+  },
+  loading: false,
+  cartItems: {},
+  removeFromWishlist: (productId: string) => {
+    console.log(`Remove product from wishlist: ${productId}`);
+  },
+  addToCart: (id: string, qty: number) => {
+    console.log(`Add to cart: Product ${id} (Qty: ${qty})`);
+  },
+  updateQuantity: (id: string, qty: number) => {
+    console.log(`Update quantity: Product ${id} -> ${qty}`);
   },
   products: [
     {
-      id: "prod_wish_1",
-      title: "Genda : Kolha Flats",
-      slug: "genda-kolha-flats",
-      image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=85&w=800",
-      alt: "Genda Kolha Flats in Orange",
-      link: "/products/genda-kolha-flats",
-      price: "3990",
-      originalPrice: "4490",
-      discount: "11% OFF",
+      id: "prod_1",
+      title: "RE - 20029-C01",
+      brand: "Royal Enfield",
+      image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=800",
+      alt: "RE - 20029-C01 Eyewear",
+      link: "/products/re-20029-c01",
+      price: "MRP. 5,950/-",
+      originalPrice: "MRP. 6,950/-",
+      discount: "14% OFF",
       rating: 4.8,
-      reviewCount: 32,
-      stock: 12,
-      brand: "Fizzy Goblet",
-      badge: "Orange / 36"
+      reviewCount: 12,
+      stock: 5,
+      badge: ""
     },
     {
-      id: "prod_wish_2",
-      title: "Blush & Bronze : Bomba Sliders",
-      slug: "blush-bronze-bomba-sliders",
-      image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=85&w=800",
-      alt: "Blush and Bronze Bomba Sliders",
-      link: "/products/blush-bronze-bomba-sliders",
-      price: "3990",
-      originalPrice: "",
-      discount: "",
-      rating: 4.9,
-      reviewCount: 45,
-      stock: 8,
-      brand: "Fizzy Goblet",
-      badge: "Bronze / 36"
-    },
-    {
-      id: "prod_wish_3",
-      title: "Mirror Masala : Juttis",
-      slug: "mirror-masala-juttis",
-      image: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?auto=format&fit=crop&q=85&w=800",
-      alt: "Mirror Masala Handcrafted Juttis",
-      link: "/products/mirror-masala-juttis",
-      price: "4490",
-      originalPrice: "",
+      id: "prod_2",
+      title: "ALKAMX DTS100-A-03 // BLK-GLD",
+      brand: "DITA",
+      image: "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&q=80&w=800",
+      alt: "ALKAMX DTS100-A-03 Eyewear",
+      link: "/products/alkamx-dts100",
+      price: "MRP. 99,300/-",
+      originalPrice: "MRP. 99,300/-",
       discount: "",
       rating: 5.0,
-      reviewCount: 60,
-      stock: 5,
-      brand: "Fizzy Goblet",
-      badge: "Yellow / 36"
+      reviewCount: 4,
+      stock: 2,
+      badge: ""
     },
     {
-      id: "prod_wish_4",
-      title: "Mehndi : Kolha Flats",
-      slug: "mehndi-kolha-flats",
-      image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=85&w=800",
-      alt: "Mehndi Olive Kolha Flats",
-      link: "/products/mehndi-kolha-flats",
-      price: "4990",
-      originalPrice: "5490",
-      discount: "10% OFF",
+      id: "prod_3",
+      title: "SF1085S 219",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1085S 219 Eyewear",
+      link: "/products/sf1085s-219",
+      price: "MRP. 28,000/-",
+      originalPrice: "MRP. 32,000/-",
+      discount: "12% OFF",
+      rating: 4.9,
+      reviewCount: 18,
+      stock: 8,
+      badge: "57"
+    },
+    {
+      id: "prod_4",
+      title: "SF1090S 208",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1090S 208 Eyewear",
+      link: "/products/sf1090s-208",
+      price: "MRP. 18,500/-",
+      originalPrice: "MRP. 18,500/-",
+      discount: "",
       rating: 4.7,
-      reviewCount: 28,
-      stock: 15,
-      brand: "Fizzy Goblet",
-      badge: "Olive / 36"
-    }
-  ],
-  cartItems: {
-    prod_wish_1: 1
-  },
-  removeFromWishlist: (productId: string) => {
-    console.log("Removed from wishlist:", productId);
-  },
-  addToCart: (id: string, qty: number) => {
-    console.log("Added to cart:", id, "Qty:", qty);
-  },
-  updateQuantity: (id: string, qty: number) => {
-    console.log("Updated quantity:", id, "Qty:", qty);
-  }
+      reviewCount: 9,
+      stock: 4,
+      badge: ""
+    },
+    {
+      id: "prod_4",
+      title: "SF1090S 208",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1090S 208 Eyewear",
+      link: "/products/sf1090s-208",
+      price: "MRP. 18,500/-",
+      originalPrice: "MRP. 18,500/-",
+      discount: "",
+      rating: 4.7,
+      reviewCount: 9,
+      stock: 4,
+      badge: ""
+    },
+    {
+      id: "prod_4",
+      title: "SF1090S 208",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1090S 208 Eyewear",
+      link: "/products/sf1090s-208",
+      price: "MRP. 18,500/-",
+      originalPrice: "MRP. 18,500/-",
+      discount: "",
+      rating: 4.7,
+      reviewCount: 9,
+      stock: 4,
+      badge: ""
+    },
+    {
+      id: "prod_4",
+      title: "SF1090S 208",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1090S 208 Eyewear",
+      link: "/products/sf1090s-208",
+      price: "MRP. 18,500/-",
+      originalPrice: "MRP. 18,500/-",
+      discount: "",
+      rating: 4.7,
+      reviewCount: 9,
+      stock: 4,
+      badge: ""
+    },
+    {
+      id: "prod_4",
+      title: "SF1090S 208",
+      brand: "Ferragamo",
+      image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&q=80&w=800",
+      alt: "SF1090S 208 Eyewear",
+      link: "/products/sf1090s-208",
+      price: "MRP. 18,500/-",
+      originalPrice: "MRP. 18,500/-",
+      discount: "",
+      rating: 4.7,
+      reviewCount: 9,
+      stock: 4,
+      badge: ""
+    },
+  ]
 };
 
 export default mockWishlistProps;

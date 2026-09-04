@@ -3,85 +3,49 @@ import { CartLayoutProps } from './layout_template';
 export const mockCartProps: CartLayoutProps = {
   isSidebar: true,
   config: {
-    heading: "Your cart",
-    checkout_text: "Buy Now",
-    item_layout: "standard",
-    discount: {
-      enabled: true,
-      label: "Gift Wrapping - Rs.49",
-      showDiscount: true
-    }
+    heading: "SHOPPING CART",
+    checkout_text: "VIEW CART"
+  },
+  priceSummary: {
+    tax: 0,
+    shipping: 0,
+    discount: 0,
+    subTotal: 204550,
+    total: 204550
   },
   cart: [
     {
-      productId: "prod_cart_1",
-      image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=85&w=800",
-      name: "Brew can do it",
-      price: 2620,
-      discountedPrice: 2620,
+      productId: "cart_prod_1",
+      name: "ALKAMX DTS100-A-03 // BLK-GLD",
+      image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=400",
       quantity: 1,
+      price: 99300,
       variant: [
-        { name: "Color", value: "Brown" },
-        { name: "Size", value: "40" }
-      ],
-      sku: "FG-BC-40-BRN"
+        { id: "v_0", name: "Size", value: "0" }
+      ]
     },
     {
-      productId: "prod_cart_2",
-      image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=85&w=800",
-      name: "FREE Laptop Sleeve",
-      price: 1490,
-      discountedPrice: 0,
+      productId: "cart_prod_2",
+      name: "ALKAMX DTS100-A-03 // BLK-GLD",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&q=80&w=400",
       quantity: 1,
+      price: 99300,
       variant: [
-        { name: "Edition", value: "Limited Edition" }
-      ],
-      sku: "FG-LS-FREE"
-    },
-    {
-      productId: "prod_cart_3",
-      image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=85&w=800",
-      name: "Sunny Hunny : Bomba Sliders",
-      price: 3290,
-      discountedPrice: 3290,
-      quantity: 1,
-      variant: [
-        { name: "Color", value: "Orange" },
-        { name: "Size", value: "40" }
-      ],
-      sku: "FG-SH-40-ORG"
-    },
-    {
-      productId: "prod_cart_4",
-      image: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?auto=format&fit=crop&q=85&w=800",
-      name: "Mirror Masala : Juttis",
-      price: 4490,
-      discountedPrice: 4490,
-      quantity: 1,
-      variant: [
-        { name: "Color", value: "Yellow" }
-      ],
-      sku: "FG-MM-38-YLW"
+        { id: "v_0", name: "Size", value: "0" }
+      ]
     }
   ],
-  priceSummary: {
-    subTotal: 10400,
-    discount: 1490,
-    tax: 0,
-    shipping: 0,
-    total: 10400
-  },
-  onClose: () => {
-    console.log("Cart closed");
-  },
-  onCheckout: () => {
-    console.log("Proceeding to checkout");
-  },
   onItemRemove: (productId: string) => {
     console.log("Remove product:", productId);
   },
   onQtyUpdate: (productId: string, quantity: number) => {
-    console.log("Update quantity:", productId, quantity);
+    console.log(`Update product ${productId} quantity to:`, quantity);
+  },
+  onClose: () => {
+    console.log("Close cart drawer");
+  },
+  onCheckout: () => {
+    console.log("Trigger checkout");
   }
 };
 

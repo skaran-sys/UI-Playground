@@ -78,6 +78,17 @@ import EyeLoungeBrandPromisesLayout from "@/themes/eyeLoungeOnline/brandPromises
 import sampleEyeLoungeBrandPromisesProps from "@/themes/eyeLoungeOnline/brandPromises/props.sample";
 import EyeLoungeFooterLayout from "@/themes/eyeLoungeOnline/footer/layout_template";
 import sampleEyeLoungeFooterProps from "@/themes/eyeLoungeOnline/footer/props.sample";
+import EyeLoungeAboutUsLayout from "@/themes/eyeLoungeOnline/aboutUs/layout_template";
+import sampleEyeLoungeAboutUsProps from "@/themes/eyeLoungeOnline/aboutUs/props.sample";
+import EyeLoungeWishlistLayout from "@/themes/eyeLoungeOnline/wishList/layout_template";
+import sampleEyeLoungeWishlistProps from "@/themes/eyeLoungeOnline/wishList/props.sample";
+import EyeLoungeCartLayout from "@/themes/eyeLoungeOnline/cart/layout_template";
+import sampleEyeLoungeCartProps from "@/themes/eyeLoungeOnline/cart/props.sample";
+import EyeLoungeProductListingLayout from "@/themes/eyeLoungeOnline/productListing/layout_template";
+import sampleEyeLoungeProductListingProps from "@/themes/eyeLoungeOnline/productListing/props.sample";
+
+
+
 
 export default function PlaygroundPage() {
   const [activeTheme, setActiveTheme] = useState<"fizzyGoblet" | "dotAndKey" | "eyeLounge">("eyeLounge");
@@ -272,11 +283,23 @@ export default function PlaygroundPage() {
                 onCartToggle={() => setIsCartOpen(true)}
               />
               <EyeLoungeHeroLayout {...sampleEyeLoungeHeroProps} />
+              <EyeLoungeProductListingLayout {...sampleEyeLoungeProductListingProps} />
               <EyeLoungeMainCategoryLayout {...sampleEyeLoungeMainCategoryProps} />
               <EyeLoungeProductCollectionLayout {...sampleEyeLoungeProductCollectionProps} />
               <EyeLoungeBrandStoryLayout {...sampleEyeLoungeBrandStoryProps} />
+              <EyeLoungeAboutUsLayout {...sampleEyeLoungeAboutUsProps} />
+              <EyeLoungeWishlistLayout {...sampleEyeLoungeWishlistProps} />
               <EyeLoungeBrandPromisesLayout {...sampleEyeLoungeBrandPromisesProps} />
               <EyeLoungeFooterLayout {...sampleEyeLoungeFooterProps} />
+
+              {/* Slide-over Right Cart Drawer */}
+              {isCartOpen && (
+                <EyeLoungeCartLayout
+                  {...sampleEyeLoungeCartProps}
+                  isSidebar={true}
+                  onClose={() => setIsCartOpen(false)}
+                />
+              )}
             </div>
           )
         ) : (
@@ -321,11 +344,15 @@ export default function PlaygroundPage() {
                   : {
                       header: sampleEyeLoungeHeaderProps,
                       hero: sampleEyeLoungeHeroProps,
+                      productListing: sampleEyeLoungeProductListingProps,
                       mainCategory: sampleEyeLoungeMainCategoryProps,
                       productCollection: sampleEyeLoungeProductCollectionProps,
                       brandStory: sampleEyeLoungeBrandStoryProps,
+                      aboutUs: sampleEyeLoungeAboutUsProps,
+                      wishlist: sampleEyeLoungeWishlistProps,
                       brandPromises: sampleEyeLoungeBrandPromisesProps,
                       footer: sampleEyeLoungeFooterProps,
+                      cart: sampleEyeLoungeCartProps,
                     },
                 null,
                 2

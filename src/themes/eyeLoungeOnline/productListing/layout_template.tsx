@@ -1,36 +1,25 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import {
-  Heart,
-  ShoppingBag,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Plus,
-  X,
-  Loader2
-} from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { SlidersHorizontal, ChevronDown, ChevronUp, Heart } from 'lucide-react';
 
+/* ── 1. Schema Definitions ── */
 export interface Product {
   id: string;
   title: string;
   slug?: string;
   image: string;
-  hoverImages?: string[];
   alt: string;
   link: string;
-
   price: string;
   originalPrice: string;
   discount: string;
-
   rating: number;
   reviewCount: number;
-
   stock: number;
   brand: string;
   badge: string;
+  hoverImages?: string[];
 }
 
 export interface BadgeConfig {
@@ -89,29 +78,21 @@ export interface ActionButtonConfig {
 
 export interface ProductCardConfig {
   overlay: boolean;
-
   spacing: number;
   corner: number;
   shadow: boolean;
-
   showSubTitle: boolean;
   showPrice: boolean;
-
   coverImage: boolean;
-
   badge: BadgeConfig;
   discount: DiscountConfig;
   ratings: RatingConfig;
   wishlist: WishlistConfig;
-
   coverVideo: CoverVideoConfig;
   slideShow?: SlideShowConfig;
-
   buyNow: ActionButtonConfig;
   addToCart: ActionButtonConfig;
 }
-
-/* ---------------------------- PAGINATION TYPE ---------------------------- */
 
 export interface Pagination {
   page: number;
@@ -122,18 +103,12 @@ export interface Pagination {
   hasPrevPage: boolean;
 }
 
-/* ---------------------------- CONFIG TYPE ---------------------------- */
-
 export interface LayoutConfig {
   title: string;
   subtitle?: string;
   card: ProductCardConfig;
   showFilters: boolean;
 }
-
-// -------------------------
-// GENERIC FILTER VALUE
-// -------------------------
 
 export type FilterValueItem =
   | {
@@ -149,10 +124,6 @@ export type FilterValueItem =
       [key: string]: any;
     };
 
-// -------------------------
-// FILTER (FULLY DYNAMIC KEY)
-// -------------------------
-
 export interface Filter {
   key: string;
   label: string;
@@ -161,25 +132,15 @@ export interface Filter {
   [key: string]: any;
 }
 
-// -------------------------
-// SORT OPTION
-// -------------------------
-
 export interface SortOption {
   key: string;
   label: string;
 }
 
-// -------------------------
-// ROOT RESPONSE
-// -------------------------
-
 export interface FiltersResponse {
   filters: Filter[];
   sortOptions: SortOption[];
 }
-
-/* ---------------------------- LAYOUT PROPS ---------------------------- */
 
 interface ProductActions {
   addToCart: (id: string, qty: number) => void;
@@ -197,13 +158,9 @@ export interface ProductCardPropsType extends ProductActions {
 
 export interface LayoutPropsTypes extends ProductActions {
   products: Product[];
-
   config: LayoutConfig;
-
   pagination?: Pagination;
-
   onPageChange: (page: number) => void;
-
   filters: Filter[];
   sortOptions: SortOption[];
   applyFilters: () => void;
@@ -219,682 +176,513 @@ export interface ProductFilterProps {
   clearFilters?: () => void;
 }
 
-export default function Layout(props: LayoutPropsTypes) {
-  const {
-    products = [],
-    config,
-    filters = [],
-    sortOptions = [],
-    addToCart,
-    addToWishlist,
-    updateQuantity,
-    isWishlisted,
-    cartItems,
-    pagination,
-    onPageChange,
-    applyFilters,
-    clearFilters,
-    loading = false
-  } = props;
+/* ── 2. Product Card Component ── */
+export function ProductCard({
+  product,
+  config,
+  addToCart,
+  addToWishlist,
+  isWishlisted
+}: ProductCardPropsType) {
+  const wishlisted = isWishlisted(product.id);
+  const showWishlist = config?.wishlist?.isVisible !== false;
+  const showBadge = config?.badge?.isVisible !== false && Boolean(product.badge);
+  const wishlistActiveColor = config?.wishlist?.color || '#E11D48';
 
-  const [selectedSort, setSelectedSort] = useState<string>(
-    sortOptions[0]?.key || "featured"
-  );
-  const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    product_type: false,
-    price: true,
-    size: false,
-    color: false
-  });
-
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
-
-  // Dynamic price bounds derived from filter config
-  const priceFilterConfig = useMemo(() => {
-    const pFilter = filters.find((f) => f.key === "price");
-    if (pFilter && pFilter.value && pFilter.value.length > 0) {
-      const val = pFilter.value[0];
-      if ("min" in val && "max" in val) {
-        return { min: val.min, max: val.max };
-      }
+  const getPositionClass = (pos?: CardPosition) => {
+    switch (pos) {
+      case 'top-right':
+        return 'top-3 right-3';
+      case 'bottom-left':
+        return 'bottom-3 left-3';
+      case 'bottom-right':
+        return 'bottom-3 right-3';
+      case 'top-left':
+      default:
+        return 'top-3 left-3';
     }
-    return { min: 0, max: 9990 };
-  }, [filters]);
-
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({
-    min: priceFilterConfig.min,
-    max: priceFilterConfig.max
-  });
-
-  const [isPriceFilterActive, setIsPriceFilterActive] = useState<boolean>(false);
-
-  const toggleSection = (key: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
   };
-
-  const handleCheckboxToggle = (filterKey: string, itemName: string) => {
-    setSelectedFilters((prev) => {
-      const currentList = prev[filterKey] || [];
-      const updatedList = currentList.includes(itemName)
-        ? currentList.filter((item) => item !== itemName)
-        : [...currentList, itemName];
-
-      const next = { ...prev, [filterKey]: updatedList };
-      if (applyFilters) applyFilters();
-      return next;
-    });
-  };
-
-  const handleRemoveAppliedFilter = (filterKey: string, itemName: string) => {
-    handleCheckboxToggle(filterKey, itemName);
-  };
-
-  const handleRemovePriceFilter = () => {
-    setPriceRange({ min: priceFilterConfig.min, max: priceFilterConfig.max });
-    setIsPriceFilterActive(false);
-    if (applyFilters) applyFilters();
-  };
-
-  const handleClearAllFilters = () => {
-    setSelectedFilters({});
-    setPriceRange({ min: priceFilterConfig.min, max: priceFilterConfig.max });
-    setIsPriceFilterActive(false);
-    if (clearFilters) clearFilters();
-  };
-
-  const hasAppliedFilters =
-    isPriceFilterActive ||
-    Object.values(selectedFilters).some((arr) => arr && arr.length > 0);
-
-  // Infinite Scroll Sentinel Observer
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!sentinelRef.current || !pagination?.hasNextPage || loading) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && pagination?.hasNextPage && !loading) {
-          onPageChange(pagination.page + 1);
-        }
-      },
-      { rootMargin: "300px" }
-    );
-
-    observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [pagination, loading, onPageChange]);
-
-  const activeSortLabel =
-    sortOptions.find((opt) => opt.key === selectedSort)?.label || "Featured";
 
   return (
-    <section
-      style={{
-        backgroundColor: 'var(--color-surface-light)',
-        color: 'var(--color-text)'
-      }}
-      className="w-full min-h-screen py-6 sm:py-10 select-none"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* ── 1. Editorial Header ── */}
-        <div className="text-center mb-8 sm:mb-12">
-          {config?.title && (
-            <h1
-              style={{ color: 'var(--color-text)' }}
-              className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal tracking-tight"
-            >
-              {config.title}
-            </h1>
-          )}
-          {config?.subtitle && (
-            <p
-              style={{ color: 'var(--color-text-muted)' }}
-              className="text-xs sm:text-sm mt-1"
-            >
-              {config.subtitle}
-            </p>
-          )}
-        </div>
-
-        {/* ── 2. Breadcrumbs & Top Sort Dropdown ── */}
-        <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4 mb-8 text-xs text-[var(--color-text-muted)] relative">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5">
-            <span className="hover:text-[var(--color-text)] cursor-pointer">Home</span>
-            <span className="opacity-60">|</span>
-            <span className="text-[var(--color-text)] font-medium">
-              {config?.title || "New Arrivals"}
-            </span>
-            <span className="opacity-60">|</span>
-            <span>{activeSortLabel}</span>
-          </nav>
-
-          {/* Sort Dropdown */}
-          {sortOptions.length > 0 && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsSortOpen(!isSortOpen)}
-                className="flex items-center gap-1 font-medium text-[var(--color-text)] hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <span className="text-[var(--color-text-muted)] font-normal">Sort by:</span>
-                <span className="underline">{activeSortLabel}</span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    isSortOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {isSortOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-[var(--color-surface-light)] border border-[var(--color-border)] shadow-xl rounded-xs z-30 py-1.5">
-                  {sortOptions.map((option) => {
-                    const isSelected = selectedSort === option.key;
-                    return (
-                      <button
-                        key={option.key}
-                        type="button"
-                        onClick={() => {
-                          setSelectedSort(option.key);
-                          setIsSortOpen(false);
-                          if (applyFilters) applyFilters();
-                        }}
-                        className={`w-full px-3.5 py-2 text-left text-xs flex items-center gap-2.5 transition-colors cursor-pointer text-[var(--color-text)] ${
-                          isSelected
-                            ? "bg-[var(--color-surface-lighter)] font-medium"
-                            : "hover:bg-[var(--color-surface-lighter)]"
-                        }`}
-                      >
-                        {/* Radio Selector Before Label */}
-                        <span
-                          className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center flex-shrink-0 ${
-                            isSelected
-                              ? "border-[var(--color-text)]"
-                              : "border-[var(--color-border)]"
-                          }`}
-                        >
-                          {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-[var(--color-text)]" />
-                          )}
-                        </span>
-                        <span className="truncate">{option.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* ── 3. Main Catalog Viewport ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Sidebar Filters */}
-          {config?.showFilters && filters.length > 0 && (
-            <aside className="lg:col-span-3 space-y-5">
-              
-              {/* Applied Filters Container */}
-              {hasAppliedFilters && (
-                <div className="border-b border-[var(--color-border)] pb-4 space-y-2.5">
-                  <span className="text-xs font-semibold text-[var(--color-text)] tracking-wider">
-                    Applied Filters
-                  </span>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    {/* Price Filter Tag */}
-                    {isPriceFilterActive && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--color-surface-lighter)] border border-[var(--color-border)] text-[11px] text-[var(--color-text)] rounded-xs">
-                        <span>₹ {priceRange.min} - ₹ {priceRange.max}</span>
-                        <button
-                          type="button"
-                          onClick={handleRemovePriceFilter}
-                          aria-label="Remove price filter"
-                          className="hover:opacity-60 cursor-pointer"
-                        >
-                          <X className="w-3 h-3 stroke-[2]" />
-                        </button>
-                      </span>
-                    )}
-
-                    {/* Checkbox Filter Tags */}
-                    {Object.entries(selectedFilters).map(([fKey, items]) =>
-                      items.map((item) => (
-                        <span
-                          key={`${fKey}-${item}`}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--color-surface-lighter)] border border-[var(--color-border)] text-[11px] text-[var(--color-text)] rounded-xs"
-                        >
-                          <span>{item}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveAppliedFilter(fKey, item)}
-                            aria-label={`Remove filter ${item}`}
-                            className="hover:opacity-60 cursor-pointer"
-                          >
-                            <X className="w-3 h-3 stroke-[2]" />
-                          </button>
-                        </span>
-                      ))
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleClearAllFilters}
-                    className="text-xs underline text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer block pt-1"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              )}
-
-              {/* Dynamic Faceted Filters */}
-              {filters.map((filter) => {
-                const isOpen = openSections[filter.key] ?? false;
-
-                return (
-                  <div
-                    key={filter.key}
-                    className="border-b border-[var(--color-border)] pb-5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleSection(filter.key)}
-                      className="w-full flex items-center justify-between text-xs font-semibold uppercase tracking-wider py-1 cursor-pointer text-[var(--color-text)]"
-                    >
-                      <span>{filter.label}</span>
-                      {isOpen ? (
-                        <X className="w-3.5 h-3.5 stroke-[1.8]" />
-                      ) : (
-                        <Plus className="w-3.5 h-3.5 stroke-[1.8]" />
-                      )}
-                    </button>
-
-                    {isOpen && (
-                      <div className="mt-3.5">
-                        {/* Dynamic Price Range Filter */}
-                        {filter.key === "price" ? (
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-1 flex items-center px-2.5 py-1.5 bg-[var(--color-surface-lighter)] border border-[var(--color-border)] rounded-xs text-xs">
-                                <span className="text-[var(--color-text-muted)] mr-1">₹</span>
-                                <input
-                                  type="number"
-                                  min={priceFilterConfig.min}
-                                  max={priceRange.max}
-                                  value={priceRange.min}
-                                  onChange={(e) => {
-                                    setPriceRange((p) => ({
-                                      ...p,
-                                      min: Number(e.target.value)
-                                    }));
-                                    setIsPriceFilterActive(true);
-                                    if (applyFilters) applyFilters();
-                                  }}
-                                  className="w-full bg-transparent focus:outline-none text-[var(--color-text)] text-xs"
-                                />
-                              </div>
-
-                              <span className="text-xs text-[var(--color-text-muted)]">-</span>
-
-                              <div className="flex-1 flex items-center px-2.5 py-1.5 bg-[var(--color-surface-lighter)] border border-[var(--color-border)] rounded-xs text-xs">
-                                <span className="text-[var(--color-text-muted)] mr-1">₹</span>
-                                <input
-                                  type="number"
-                                  min={priceRange.min}
-                                  max={priceFilterConfig.max}
-                                  value={priceRange.max}
-                                  onChange={(e) => {
-                                    setPriceRange((p) => ({
-                                      ...p,
-                                      max: Number(e.target.value)
-                                    }));
-                                    setIsPriceFilterActive(true);
-                                    if (applyFilters) applyFilters();
-                                  }}
-                                  className="w-full bg-transparent focus:outline-none text-[var(--color-text)] text-xs"
-                                />
-                              </div>
-                            </div>
-
-                            <input
-                              type="range"
-                              min={priceFilterConfig.min}
-                              max={priceFilterConfig.max}
-                              value={priceRange.max}
-                              onChange={(e) => {
-                                setPriceRange((p) => ({
-                                  ...p,
-                                  max: Number(e.target.value)
-                                }));
-                                setIsPriceFilterActive(true);
-                                if (applyFilters) applyFilters();
-                              }}
-                              className="w-full accent-[var(--color-text)] cursor-pointer"
-                            />
-                          </div>
-                        ) : filter.key === "color" ? (
-                          /* Dynamic Color Swatch Grid */
-                          <div className="grid grid-cols-2 gap-2">
-                            {filter.value.map((item, idx) => {
-                              if (!("name" in item)) return null;
-                              const isChecked = (
-                                selectedFilters[filter.key] || []
-                              ).includes(item.name);
-
-                              return (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  onClick={() =>
-                                    handleCheckboxToggle(filter.key, item.name)
-                                  }
-                                  className={`flex items-center gap-2 p-2 border rounded-xs text-xs text-left transition-colors cursor-pointer ${
-                                    isChecked
-                                      ? "border-[var(--color-text)] bg-[var(--color-surface-lighter)] font-medium"
-                                      : "border-[var(--color-border)] hover:bg-[var(--color-surface-lighter)]"
-                                  }`}
-                                >
-                                  <span
-                                    style={{
-                                      backgroundColor: item.hex || item.name.toLowerCase()
-                                    }}
-                                    className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0"
-                                  />
-                                  <span className="truncate">{item.name}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          /* Checkbox List Filter */
-                          <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                            {filter.value.map((item, idx) => {
-                              if (!("name" in item)) return null;
-                              const isChecked = (
-                                selectedFilters[filter.key] || []
-                              ).includes(item.name);
-
-                              return (
-                                <label
-                                  key={idx}
-                                  className="flex items-center justify-between text-xs cursor-pointer group hover:text-[var(--color-primary)] transition-colors py-0.5"
-                                >
-                                  <div className="flex items-center gap-2.5">
-                                    <input
-                                      type="checkbox"
-                                      checked={isChecked}
-                                      onChange={() =>
-                                        handleCheckboxToggle(filter.key, item.name)
-                                      }
-                                      className="w-3.5 h-3.5 rounded-xs accent-[var(--color-text)] cursor-pointer"
-                                    />
-                                    <span>{item.name}</span>
-                                  </div>
-                                  {typeof item.count === "number" && (
-                                    <span className="text-[11px] text-[var(--color-text-muted)]">
-                                      {item.count}
-                                    </span>
-                                  )}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </aside>
-          )}
-
-          {/* Right Product Grid */}
-          <main
-            className={`${
-              config?.showFilters ? "lg:col-span-9" : "lg:col-span-12"
-            }`}
+    <div className="group relative flex flex-col items-center select-none text-center h-full">
+      {/* ── Fixed Height Image Canvas ── */}
+      <div
+        style={{
+          backgroundColor: 'transparent',
+          borderRadius: `${config?.corner ?? 16}px`
+        }}
+        className="relative w-full h-[280px] sm:h-[320px] md:h-[350px] overflow-hidden flex items-center justify-center p-6 transition-colors duration-300 group-hover:![background-color:var(--color-surface)] flex-shrink-0"
+      >
+        {/* Wishlist Action */}
+        {showWishlist && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              addToWishlist(product.id);
+            }}
+            aria-label={`Toggle wishlist for ${product.title}`}
+            className={`absolute ${getPositionClass(config?.wishlist?.position)} p-1.5 transition-transform active:scale-90 z-20 cursor-pointer`}
           >
-            {products.length === 0 && !loading ? (
-              <div className="py-24 text-center">
-                <p className="text-sm font-serif text-[var(--color-text-muted)]">
-                  No products matched your selection.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleClearAllFilters}
-                  className="mt-3 text-xs underline uppercase tracking-wider text-[var(--color-text)] cursor-pointer hover:opacity-75"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    config={config.card}
-                    index={index}
-                    addToCart={addToCart}
-                    addToWishlist={addToWishlist}
-                    updateQuantity={updateQuantity}
-                    isWishlisted={isWishlisted}
-                    cartItems={cartItems}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Infinite Scroll Trigger Sentinel */}
-            <div ref={sentinelRef} className="w-full py-8 flex justify-center items-center">
-              {loading && (
-                <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-                  <Loader2 className="w-4 h-4 animate-spin text-[var(--color-text)]" />
-                  <span>Loading more items...</span>
-                </div>
-              )}
-            </div>
-          </main>
-
-        </div>
-
-      </div>
-    </section>
-  );
-}
-
-/* ── Individual Product Card Sub-component ── */
-export function ProductCard(props: ProductCardPropsType) {
-  const {
-    product,
-    config,
-    addToCart,
-    addToWishlist,
-    isWishlisted
-  } = props;
-
-  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [isLikedLocally, setIsLikedLocally] = useState<boolean>(
-    isWishlisted(product.id)
-  );
-
-  useEffect(() => {
-    setIsLikedLocally(isWishlisted(product.id));
-  }, [product.id, isWishlisted]);
-
-  const allImages = [
-    product.image,
-    ...(product.hoverImages || [])
-  ].filter(Boolean);
-
-  const hasMultipleImages =
-    allImages.length > 1 && config.slideShow?.isVisible !== false;
-
-  const handlePrevImage = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setActiveImageIndex((prev) =>
-      prev === 0 ? allImages.length - 1 : prev - 1
-    );
-  };
-
-  const handleNextImage = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setActiveImageIndex((prev) =>
-      prev === allImages.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLikedLocally((prev) => !prev);
-    addToWishlist(product.id);
-  };
-
-  const handleQuickAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(product.id, 1);
-  };
-
-  const currentImageSrc = allImages[activeImageIndex] || product.image;
-
-  return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setActiveImageIndex(0);
-      }}
-      className="group flex flex-col w-full relative focus:outline-none"
-    >
-      {/* ── 1. Image Viewport ── */}
-      <div className="relative w-full aspect-[4/5] overflow-hidden rounded-xs bg-[var(--color-surface-lighter)]">
-        <a href={product.link || `#`} className="block w-full h-full">
-          {currentImageSrc && (
-            <img
-              src={currentImageSrc}
-              alt={product.alt || product.title}
-              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-              loading="lazy"
+            <Heart
+              style={{
+                fill: wishlisted ? wishlistActiveColor : 'transparent',
+                color: wishlisted ? wishlistActiveColor : 'var(--color-text-light)'
+              }}
+              className="w-4 h-4 stroke-[1.5] transition-colors"
             />
-          )}
+          </button>
+        )}
+
+        {/* Product Visual */}
+        <a
+          href={product.link}
+          className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        >
+          <img
+            src={product.image}
+            alt={product.alt || product.title}
+            className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
         </a>
 
-        {/* Badge Pill Top-Left */}
-        {config.badge?.isVisible && product.badge && (
+        {/* Quick Shop Action Pill */}
+        {config?.addToCart?.isVisible !== false && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToCart(product.id, 1);
+              }}
+              style={{
+                backgroundColor: 'var(--color-surface-light)',
+                color: 'var(--color-text)',
+                borderColor: 'var(--color-border)'
+              }}
+              className="pointer-events-auto px-6 py-2 rounded-full border text-xs font-medium tracking-wide shadow-sm hover:![background-color:var(--color-primary)] hover:![color:var(--color-primary-contrast)] transition-all transform -translate-y-1 group-hover:translate-y-0 cursor-pointer"
+            >
+              {config?.addToCart?.btnText || "Quick Shop"}
+            </button>
+          </div>
+        )}
+
+        {/* Badge Indicator */}
+        {showBadge && (
           <span
             style={{
-              backgroundColor: config.badge.bgColor || "#e08b8b",
-              color: "#ffffff"
+              color: 'var(--color-text-muted)',
+              backgroundColor: config?.badge?.bgColor || 'transparent'
             }}
-            className="absolute top-2.5 left-2.5 z-10 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-xs"
+            className="absolute bottom-3 inset-x-0 mx-auto text-[11px] font-medium tracking-wider"
           >
             {product.badge}
           </span>
         )}
-
-        {/* Wishlist Heart Icon Top-Right (Instant Local Toggle & Event Dispatch) */}
-        {config.wishlist?.isVisible && (
-          <button
-            type="button"
-            onClick={handleWishlistToggle}
-            aria-label={`Wishlist ${product.title}`}
-            className="absolute top-2.5 right-2.5 z-10 p-1.5 text-[var(--color-text)] hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-          >
-            <Heart
-              className="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors drop-shadow-xs"
-              fill={isLikedLocally ? "#ef4444" : "none"}
-              color={isLikedLocally ? "#ef4444" : (config.wishlist.color || "#ffffff")}
-              strokeWidth={1.8}
-            />
-          </button>
-        )}
-
-        {/* Multi-Image Hover Chevrons */}
-        {hasMultipleImages && isHovered && (
-          <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 flex items-center justify-between pointer-events-none z-10 px-1">
-            <button
-              type="button"
-              onClick={handlePrevImage}
-              className="p-1 rounded-full bg-white/80 hover:bg-white text-black shadow-xs pointer-events-auto transition-colors cursor-pointer"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="w-3.5 h-3.5 stroke-[2]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleNextImage}
-              className="p-1 rounded-full bg-white/80 hover:bg-white text-black shadow-xs pointer-events-auto transition-colors cursor-pointer"
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-3.5 h-3.5 stroke-[2]" />
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* ── 2. Product Meta & Pricing Block with Shopping Bag Icon Below Image ── */}
-      <div className="pt-2.5 pb-1 flex items-start justify-between gap-2">
-        <div className="flex flex-col text-left min-w-0 flex-1">
-          <a href={product.link || `#`} className="block">
-            <h2
+      {/* ── Brand, Title & Price (Auto Adjusting Content) ── */}
+      <div className="mt-3.5 space-y-1 w-full px-2 flex flex-col flex-1 justify-start">
+        {product.brand && (
+          <h4
+            style={{ color: 'var(--color-text)' }}
+            className="text-xs font-bold tracking-tight uppercase"
+          >
+            {product.brand}
+          </h4>
+        )}
+
+        {config?.showSubTitle !== false && (
+          <a href={product.link} className="block group-hover:underline">
+            <h3
               style={{ color: 'var(--color-text)' }}
-              className="text-xs sm:text-sm font-normal tracking-tight truncate hover:underline"
+              className="text-xs font-normal tracking-tight line-clamp-1"
             >
               {product.title}
-            </h2>
+            </h3>
           </a>
+        )}
 
-          {config.showSubTitle && product.brand && (
-            <p
-              style={{ color: 'var(--color-text-muted)' }}
-              className="text-[11px] font-normal truncate mt-0.5"
+        {config?.showPrice !== false && (
+          <p
+            style={{ color: 'var(--color-text-muted)' }}
+            className="text-xs font-normal mt-auto"
+          >
+            {product.price}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── 3. Main Product Listing Layout ── */
+export default function Layout(props: LayoutPropsTypes) {
+  const {
+    products = [],
+    config,
+    pagination,
+    onPageChange,
+    filters = [],
+    sortOptions = [],
+    applyFilters,
+    clearFilters,
+    loading,
+    addToCart,
+    addToWishlist,
+    updateQuantity,
+    isWishlisted,
+    cartItems
+  } = props;
+
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [selectedSort, setSelectedSort] = useState<string>(
+    sortOptions[0]?.label || "Alphabetically, A-Z"
+  );
+
+  const availabilityFilter = filters.find((f) => f.key === 'availability');
+  const priceFilter = filters.find((f) => f.key === 'price');
+  const priceItem = priceFilter?.value?.[0] as { min: number; max: number } | undefined;
+
+  const minPrice = priceItem?.min ?? 0;
+  const maxPrice = priceItem?.max ?? 100000;
+
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<number>(maxPrice);
+
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleResetFilters = () => {
+    setSelectedAvailability([]);
+    setPriceRange(maxPrice);
+    clearFilters();
+  };
+
+  return (
+    <div
+      style={{
+        backgroundColor: 'var(--color-background)',
+        color: 'var(--color-text)'
+      }}
+      className="w-full min-h-screen select-none"
+    >
+      {/* Title Banner */}
+      <header className="w-full pt-14 pb-10 text-center">
+        <h1
+          style={{ color: 'var(--color-text)' }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-[0.25em] uppercase"
+        >
+          {config?.title || "EYEGLASSES"}
+        </h1>
+        {config?.subtitle && (
+          <p
+            style={{ color: 'var(--color-text-muted)' }}
+            className="text-xs sm:text-sm mt-2 font-normal"
+          >
+            {config.subtitle}
+          </p>
+        )}
+      </header>
+
+      <main className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pb-20">
+        
+        {/* ── Toolbar: Filter Button & Sort Dropdown ── */}
+        <div className="flex items-center justify-between gap-4 py-4 mb-6">
+          {/* Filter Toggle Button */}
+          {config?.showFilters !== false ? (
+            <button
+              type="button"
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+              style={{ color: 'var(--color-text)' }}
+              className="flex items-center gap-1.5 text-xs font-normal tracking-wide hover:opacity-70 cursor-pointer"
             >
-              {product.brand}
-            </p>
-          )}
+              <SlidersHorizontal className="w-3.5 h-3.5 stroke-[1.8]" />
+              <span>Filter</span>
+            </button>
+          ) : <div />}
 
-          {config.showPrice && product.price && (
-            <div className="flex items-baseline gap-2 mt-1">
-              <span
-                style={{ color: 'var(--color-text)' }}
-                className="text-xs sm:text-sm font-semibold tracking-tight"
+          {/* Sort Dropdown */}
+          {sortOptions.length > 0 && (
+            <div ref={sortRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                style={{
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text)',
+                  backgroundColor: 'var(--color-surface-light)'
+                }}
+                className="flex items-center justify-between gap-3 px-4 py-2 rounded-full border text-xs tracking-tight cursor-pointer min-w-[180px]"
               >
-                ₹ {product.price}
-              </span>
+                <span>{selectedSort}</span>
+                {sortDropdownOpen ? (
+                  <ChevronUp className="w-3.5 h-3.5 stroke-[1.6]" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 stroke-[1.6]" />
+                )}
+              </button>
 
-              {product.originalPrice && (
-                <span className="text-[11px] line-through text-[var(--color-text-light)]">
-                  ₹ {product.originalPrice}
-                </span>
+              {sortDropdownOpen && (
+                <div
+                  style={{
+                    backgroundColor: 'var(--color-surface-light)',
+                    borderColor: 'var(--color-border)'
+                  }}
+                  className="absolute right-0 top-full mt-2 w-56 rounded-lg border shadow-xl py-1.5 z-30 max-h-60 overflow-y-auto"
+                >
+                  {sortOptions.map((opt) => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSort(opt.label);
+                        setSortDropdownOpen(false);
+                        applyFilters();
+                      }}
+                      style={{
+                        backgroundColor:
+                          selectedSort === opt.label
+                            ? 'var(--color-surface)'
+                            : 'transparent',
+                        color: 'var(--color-text)'
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs hover:![background-color:var(--color-surface)] transition-colors cursor-pointer"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Shopping Bag Icon Below Image Aligned Right */}
-        {config.addToCart?.isVisible && (
-          <button
-            type="button"
-            onClick={handleQuickAdd}
-            aria-label={`Add ${product.title} to bag`}
-            className="p-1.5 text-[var(--color-text)] hover:opacity-70 transition-opacity cursor-pointer flex-shrink-0 mt-0.5"
+        {/* ── Expandable Filter Container ── */}
+        {config?.showFilters !== false && filterPanelOpen && (
+          <div
+            style={{
+              borderColor: 'var(--color-border)',
+              backgroundColor: 'var(--color-surface-light)'
+            }}
+            className="border rounded-xl p-6 mb-12 grid grid-cols-1 md:grid-cols-2 gap-8 shadow-xs"
           >
-            <ShoppingBag className="w-4 h-4 stroke-[1.6]" />
-          </button>
+            {/* Availability Checkboxes */}
+            {availabilityFilter && (
+              <div>
+                <h3
+                  style={{
+                    borderColor: 'var(--color-text)',
+                    color: 'var(--color-text)'
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider pb-1.5 mb-4 border-b inline-block"
+                >
+                  Availability
+                </h3>
+                <div className="space-y-2.5">
+                  {(availabilityFilter.value as any[]).map((val, idx) => {
+                    const isChecked = selectedAvailability.includes(val.name);
+
+                    return (
+                      <label key={idx} className="flex items-center gap-2.5 cursor-pointer text-xs">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedAvailability([...selectedAvailability, val.name]);
+                            } else {
+                              setSelectedAvailability(
+                                selectedAvailability.filter((n) => n !== val.name)
+                              );
+                            }
+                          }}
+                          style={{
+                            borderColor: 'var(--color-border)',
+                            accentColor: 'var(--color-primary)'
+                          }}
+                          className="w-3.5 h-3.5 rounded cursor-pointer"
+                        />
+                        <span style={{ color: 'var(--color-text)' }}>
+                          {val.name}({val.count})
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Price Range Slider & Filter Actions */}
+            {priceFilter && (
+              <div>
+                <h3
+                  style={{
+                    borderColor: 'var(--color-text)',
+                    color: 'var(--color-text)'
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider pb-1.5 mb-4 border-b inline-block"
+                >
+                  Price
+                </h3>
+
+                <div className="space-y-4 max-w-sm">
+                  <input
+                    type="range"
+                    min={minPrice}
+                    max={maxPrice}
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(Number(e.target.value))}
+                    style={{ accentColor: 'var(--color-primary)' }}
+                    className="w-full cursor-pointer"
+                  />
+
+                  <p
+                    style={{ color: 'var(--color-text-muted)' }}
+                    className="text-xs font-medium"
+                  >
+                    Price:{' '}
+                    <strong style={{ color: 'var(--color-text)' }}>
+                      MRP. ₹{minPrice.toLocaleString('en-IN')}/-
+                    </strong>{' '}
+                    —{' '}
+                    <strong style={{ color: 'var(--color-text)' }}>
+                      MRP. ₹{priceRange.toLocaleString('en-IN')}/-
+                    </strong>
+                  </p>
+
+                  <div className="flex items-center gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={applyFilters}
+                      style={{
+                        borderColor: 'var(--color-text)',
+                        color: 'var(--color-primary-contrast)',
+                        backgroundColor: 'var(--color-primary)'
+                      }}
+                      className="px-6 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wider hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      FILTER
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleResetFilters}
+                      style={{ color: 'var(--color-text-muted)' }}
+                      className="text-[11px] font-medium underline hover:text-[var(--color-text)] transition-colors cursor-pointer"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         )}
-      </div>
+
+        {/* ── Loading State ── */}
+        {loading && (
+          <div
+            style={{ color: 'var(--color-text-light)' }}
+            className="w-full py-24 flex items-center justify-center text-xs tracking-widest uppercase"
+          >
+            Loading collection...
+          </div>
+        )}
+
+        {/* ── Product Grid ── */}
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 transition-all duration-300 items-stretch">
+            {products.map((product, idx) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                config={config.card}
+                index={idx}
+                addToCart={addToCart}
+                addToWishlist={addToWishlist}
+                updateQuantity={updateQuantity}
+                isWishlisted={isWishlisted}
+                cartItems={cartItems}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* ── Bottom Pagination ── */}
+        {pagination && pagination.totalPages > 1 && (
+          <div
+            style={{ borderColor: 'var(--color-border)' }}
+            className="mt-20 pt-8 border-t flex items-center justify-center gap-4 text-xs font-normal"
+          >
+            {Array.from({ length: Math.min(3, pagination.totalPages) }, (_, i) => i + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => onPageChange(page)}
+                  style={{
+                    color:
+                      pagination.page === page
+                        ? 'var(--color-primary)'
+                        : 'var(--color-text-muted)',
+                    fontWeight: pagination.page === page ? 'bold' : 'normal'
+                  }}
+                  className="p-1 cursor-pointer hover:opacity-70"
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            {pagination.totalPages > 4 && (
+              <span style={{ color: 'var(--color-text-light)' }}>..</span>
+            )}
+
+            {pagination.totalPages > 3 && (
+              <button
+                type="button"
+                onClick={() => onPageChange(pagination.totalPages)}
+                style={{
+                  color:
+                    pagination.page === pagination.totalPages
+                      ? 'var(--color-primary)'
+                      : 'var(--color-text-muted)',
+                  fontWeight: pagination.page === pagination.totalPages ? 'bold' : 'normal'
+                }}
+                className="p-1 cursor-pointer hover:opacity-70"
+              >
+                {pagination.totalPages}
+              </button>
+            )}
+
+            {pagination.hasNextPage && (
+              <button
+                type="button"
+                onClick={() => onPageChange(pagination.page + 1)}
+                style={{ color: 'var(--color-text)' }}
+                className="p-1 cursor-pointer hover:opacity-70 ml-2"
+              >
+                Next
+              </button>
+            )}
+          </div>
+        )}
+
+      </main>
     </div>
   );
 }
